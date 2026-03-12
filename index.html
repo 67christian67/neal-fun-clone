@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Christian's Tutoring Hub | 400+ Unblocked Games & Lessons</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #0a0a0a; color: #0f0; margin: 0; padding: 0; line-height: 1.4; }
+    header { background: #000; padding: 25px; text-align: center; border-bottom: 4px solid #0f0; }
+    h1 { margin: 0; font-size: 2.2em; }
+    .nav { background: #111; padding: 12px; text-align: center; font-size: 1.1em; }
+    .nav span { margin: 0 20px; cursor: pointer; }
+    .nav button { background: #0f0; color: #000; border: none; padding: 6px 14px; cursor: pointer; border-radius: 4px; font-weight: bold; }
+    .section { padding: 30px; max-width: 1400px; margin: 0 auto; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+    .card { background: #1a1a1a; border: 2px solid #0f0; padding: 18px; border-radius: 10px; transition: all 0.2s; }
+    .card:hover { transform: translateY(-5px); box-shadow: 0 0 20px #0f0aa; }
+    .card h3 { margin: 0 0 10px; color: #0ff; font-size: 1.3em; }
+    .card p { margin: 0 0 12px; font-size: 0.95em; color: #ccc; }
+    .card button { background: #0f0; color: #000; border: none; padding: 8px 16px; cursor: pointer; border-radius: 4px; font-weight: bold; }
+    #admin-panel { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #000; border: 3px solid #0f0; padding: 30px; z-index: 999; width: 90%; max-width: 550px; color: #0f0; box-shadow: 0 0 30px #0f0; }
+    #admin-panel input, #admin-panel textarea { width: 100%; margin: 10px 0; padding: 10px; background: #111; color: #0f0; border: 1px solid #0f0; border-radius: 4px; box-sizing: border-box; }
+    #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 998; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🌟 Noah's Tutoring Hub | 400+ Unblocked Games & Lessons 🌟</h1>
+    <p id="online">Online: <span id="count">868</span> • Alr bro ts was not the wind</p>
+  </header>
+
+  <div class="nav">
+    <span>Online: <span id="count-nav">868</span></span>
+    <span onclick="randomLesson()">🎲 Random Lesson</span>
+    <span>Settings (Ctrl+Shift+N for admin)</span>
+    <span onclick="location.reload()">Refresh</span>
+    <span>About:Blank</span>
+  </div>
+
+  <div class="section">
+    <h2>POPULAR LESSONS</h2>
+    <div id="popular" class="cards"></div>
+  </div>
+
+  <div class="section">
+    <h2>ALL LESSONS (367 shown of 367+)</h2>
+    <div id="all" class="cards"></div>
+  </div>
+
+  <!-- Admin Panel -->
+  <div id="overlay" onclick="closeAdmin()"></div>
+  <div id="admin-panel">
+    <h2>Admin: Add New Lesson</h2>
+    <input id="new-title" placeholder="Lesson Title (required)" required>
+    <textarea id="new-desc" placeholder="Short description (optional)"></textarea>
+    <label><input type="checkbox" id="new-popular"> Mark as Popular</label>
+    <br><br>
+    <button onclick="addLesson()">Add Lesson</button>
+    <button onclick="closeAdmin()" style="background:#f44; margin-left:10px;">Cancel</button>
+    <p style="font-size:0.8em; color:#888; margin-top:15px;">Changes saved in browser (localStorage) — visible only to you until shared/exported.</p>
+  </div>
+
+  <script>
+    // Full lessons list from your site
+    let lessons = [
+      {title: "Balatro", desc: "Build insane poker hands with special Joker cards", popular: true},
+      {title: "Cloverpit", desc: "A dark gambling rogue-lite. Beat the slot machine, pay your debts, and escape the pit", popular: true},
+      {title: "Peaks of Yore", desc: "A first-person physics-based climbing game set in the great outdoors", popular: true},
+      {title: "Untitled Goose Game", desc: "A game where you are a goose let loose on an unsuspecting village terroizing EVERYONE", popular: true},
+      {title: "Plants Vs Zombies 2", desc: "Defend your lawn with crazy plants against fun-loving zombies across time", popular: true},
+      {title: "Hotline Miami", desc: "Fast-paced top-down action combat", popular: true},
+      {title: "Backrooms", desc: "Liminal space exploration", popular: true},
+      {title: "Friday Night Funkin", desc: "Rhythm music battles", popular: true},
+      {title: "Grand Theft Auto Vice City", desc: "An 80s-inspired open-world crime saga. Drive fast, build a criminal empire, and shoot your way to the top in a neon-soaked city", popular: true},
+      {title: "Superhot", desc: "Time only moves when you move, strategy and aim combine in this unique FPS", popular: true},
+      {title: "A Bite at Freddy's", desc: "A tense horror survival game where you must monitor security cameras and manage power to survive the night against animatronic threats.", popular: false},
+      {title: "Wheely", desc: "A charming physics-based puzzle game where you help a small red car named Wheely overcome obstacles and reach his goal.", popular: false},
+      {title: "The World's Hardest Game", desc: "Test your skills and patience in this notoriously difficult precision puzzle game where you must navigate through treacherous levels.", popular: false},
+      {title: "The World's Hardest Game 2", desc: "The sequel to the original challenge, featuring even more complex levels and obstacles to master.", popular: false},
+      {title: "The World's Hardest Game 3", desc: "A third installment of the brutal puzzle series, pushing your reflexes and strategy to their limits.", popular: false},
+      {title: "The World's Hardest Game 4", desc: "The ultimate test of endurance and precision in the long-running series of incredibly tough levels.", popular: false},
+      {title: "Escape Road City 2", desc: "Drive fast and evade pursuit in this high-octane city racing and escape simulation.", popular: false},
+      {title: "Lumines II", desc: "A stylish rhythm-puzzle game where you match colored blocks to the beat of an evolving soundtrack.", popular: false},
+      {title: "Bank Robbery 2", desc: "Plan and execute the perfect heist in this tense sequel to the original tactical robbery game.", popular: false},
+      {title: "Bank Robbery 3", desc: "Take your criminal career to the next level with more complex vaults and advanced security systems to bypass.", popular: false},
+      {title: "Madness Combat: Project Nexus", desc: "Experience the brutal action of the Madness Combat universe in this intense fan-made Undertale-style duel.", popular: false},
+      {title: "Alien Hominid", desc: "The classic fast-paced run-and-gun shooter. Fight off secret agents and reclaim your UFO in this iconic indie hit.", popular: false},
+      {title: "Customer Support", desc: "A quirky and tense simulation where you must manage increasingly strange requests while keeping your cool.", popular: false},
+      {title: "The Deadseat", desc: "A haunting atmosphere-driven experience. Navigate through the darkness and uncover the secrets of the deadseat.", popular: false},
+      {title: "Fireboy and Watergirl: Forest Temple", desc: "The original cooperative puzzle platformer. Work together to navigate the Forest Temple and collect all the gems.", popular: false},
+      {title: "Deltatraveler", desc: "A fan-made Undertale and Deltarune adventure. Join Kris, Susie, and Noelle as they travel through different worlds.", popular: false},
+      {title: "Needy Streamer Overload", desc: "Manage the life of a young girl trying to become the #1 Internet Angel in this psychological multi-ending sim.", popular: false},
+      {title: "Pizza Tower", desc: "A high-octane 2D platformer inspired by Wario Land. Move fast, smash through walls, and save your pizzeria!", popular: false},
+      {title: "TileTopia", desc: "A relaxing yet challenging puzzle game. Arrange tiles and clear the board in this addictive strategy experience.", popular: false},
+      {title: "Earn to Die", desc: "Drive your way through a zombie apocalypse, upgrading your car to mow down the undead and reach safety.", popular: false},
+      {title: "Earn to Die 2", desc: "The massive sequel featuring a new story mode, destructible vehicles, and even more zombies to smash through.", popular: false},
+      {title: "Bart Blast", desc: "Join Bart in a high-octane explosive adventure. Use timing and strategy to blast your way through challenging levels.", popular: false},
+      {title: "Bendy and the Ink Machine: All Chapters", desc: "Explore the decayed animation studio and escape the ink demon in this complete horror saga.", popular: false},
+      {title: "Gacha Life", desc: "Create your own anime-style characters and dress them up in your favorite fashion outfits!", popular: false},
+      {title: "Gacha Verse", desc: "The sequel to Gacha World. Customize your heroes, battle in the arena, and explore a vast new world.", popular: false},
+      {title: "Tung Sahur Horror", desc: "A terrifying stealth-horror game based on the tradition of waking people for Sahur. Don't let the entities catch you.", popular: false},
+      {title: "Horror Tale", desc: "A scary adventure game where you must solve puzzles and save children from a mysterious masked kidnapper.", popular: false},
+      {title: "Dumb Ways to Die", desc: "A collection of dangerous mini-games where you must stay alive to keep your beans safe.", popular: false},
+      {title: "Bloons Tower Defense 1", desc: "The original classic that started the bloon-popping phenomenon.", popular: false},
+      {title: "Bloons Tower Defense 2", desc: "More towers and tracks. Experience the sequel to the tower defense hit.", popular: false},
+      {title: "Bloons Tower Defense 3", desc: "The third installment featuring new monkey towers and tougher bloons.", popular: false},
+      {title: "Bloons Tower Defense 4", desc: "Massive graphical upgrades and career ranks for serious tower defense players.", popular: false},
+      {title: "Bloons Tower Defense 5", desc: "The ultimate BTD experience with daily challenges and specialized building upgrades.", popular: false},
+      {title: "Brotato", desc: "A top-down arena shooter roguelite where you play a potato wielding up to 6 weapons at a time to fight off hordes of aliens", popular: false},
+      {title: "Endoparasitic 2", desc: "The intense sequel where you must survive a research facility using only one arm while fighting off mutated horrors", popular: false},
+      {title: "Endoparasitic", desc: "A unique tactical horror game where you crawl through a nightmare using a single limb to move, reload, and shoot", popular: false},
+      {title: "Baby Sniper In Vietnam", desc: "A tactical sniping game where you must complete various missions and take out targets with precision and stealth", popular: false},
+      {title: "Shift at Midnight", desc: "Survive a terrifying night shift in this claustrophobic psychological horror experience", popular: false},
+      {title: "Road of Fury", desc: "Battle across a wasteland in this high-octane vehicular combat game", popular: false},
+      {title: "Roulette Hero", desc: "Take a gamble in this intense game of chance and survival", popular: false},
+      {title: "Fear Assessment", desc: "Face your phobias in this psychological test of courage and reflexes", popular: false},
+      {title: "Dimension Incident", desc: "A surreal first-person platformer where you navigate through shifting dimensions", popular: false},
+      {title: "Raldi's Crackhouse", desc: "A chaotic parody of Baldi's Basics featuring Raldi and even stranger school rules", popular: false},
+      {title: "Christmas Massacre", desc: "An 80s-inspired slasher horror game where you must satisfy a talking Christmas tree", popular: false},
+      {title: "Boxing Random", desc: "Wacky physics-based boxing where one hit to the head wins the round", popular: false},
+      {title: "Volley Random", desc: "Fun ragdoll volleyball with random variations in every round", popular: false},
+      {title: "Basket Random", desc: "A chaotic two-player basketball game with ragdoll physics and random environments", popular: false},
+      {title: "Soccer Random", desc: "Soccer but with one button, crazy physics, and changing fields and players", popular: false},
+      {title: "Little Big Planet", desc: "A whimsical world of platforming and creativity where you can play, create, and share your own levels while playing as sackboy", popular: false},
+      {title: "The Binding of Isaac: Rebirth", desc: "A randomly generated action RPG shooter with heavy rogue-like elements. Follow Isaac on his journey to escape his mother", popular: false},
+      {title: "Littlest Pet Shop City Friends", desc: "Explore the city, play fun mini-games, and collect adorable pets in this charming adventure", popular: false},
+      {title: "Silent Hill", desc: "The psychological horror classic. Navigate the fog-filled town and face your deepest fears", popular: false},
+      {title: "Dad 'n Me", desc: "A classic side-scrolling beat 'em up where you play as a purple bully causing chaos at the park", popular: false},
+      {title: "Five Nights at Candy's 1", desc: "A popular fan-made horror game inspired by FNAF, featuring Candy the Cat and his robotic friends", popular: false},
+      {title: "Five Nights at Candy's 2", desc: "The sequel to the fan-made hit, with new mechanics and even more terrifying animatronics to avoid", popular: false},
+      {title: "Deltarune Chapters 3 & 4", desc: "A journey continues in the latest chapters of Deltarun, explore new areas and face new challenges with Kris and friends", popular: false},
+      {title: "Earthbound", desc: "An RPG where a young boy named Ness and his friends must save the world from an intergalactic threat", popular: false},
+      {title: "Hamtaro: Ham-Ham Heartbreak", desc: "Help Hamtaro and Bijou reunite Ham-Hams and repair broken hearts in this charming adventure", popular: false},
+      {title: "Class of '09", desc: "An anti-visual novel where you navigate the toxic social landscape of high school with dark humor", popular: false},
+      {title: "Antonblast", desc: "An explosive, high-speed action platformer where you must reclaim your prized spirit collection", popular: false},
+      {title: "Super Monkey Ball", desc: "Roll your ball through challenging suspended courses, reach the goal and collect bannanas", popular: false},
+      {title: "Iron Lung", desc: "Pilot a cramped submarine through an ocean of blood on an alien moon in a claustrophobic space", popular: false},
+      {title: "OMORI", desc: "A world full of colorful friends and foes as you navigate through a surreal psychological horror adventure", popular: false},
+      {title: "Fear & Hunger", desc: "A brutal and unforgiving dungeon crawler that explores dark themes and challenges", popular: false},
+      {title: "Doodle Jump", desc: "The classic arcade hit! Guide the Doodler on a journey up a sheet of graph paper", popular: false},
+      {title: "Karlson", desc: "A physics-based parkour action game where you must use movement and weapons to reach the milk at the end of the level", popular: false},
+      {title: "Toss The Turtle", desc: "Blast off and toss your turtle as far as possible using cannons, bombs, and jetpacks in this classic launcher game", popular: false},
+      {title: "Survivor.io", desc: "Battle against thousands of zombies and survive as long as possible by upgrading your weapons and skills", popular: false},
+      {title: "People Playground", desc: "A physics-based sandbox where you can experiment with various tools, weapons, and characters in a large open space", popular: false},
+      {title: "Papers, Please", desc: "Glory to Arstotzka. Work as an immigration inspector and decide who enters while managing your family's survival", popular: false},
+      {title: "Beeswarm Simulator (html version)", desc: "That one roblox game where you collect bees as slaves, except someone remade it in html", popular: false},
+      {title: "Time Shooter 3: SWAT", desc: "Enter the role of a SWAT officer in this time-bending tactical shooter", popular: false},
+      {title: "Time Shooter 2", desc: "The sequel to the time-bending shooter with more weapons, more enemies, and more complex levels", popular: false},
+      {title: "Time Shooter 1", desc: "A minimalist shooter where time stops when you do, carefully navigate through a room of enemies", popular: false},
+      {title: "The Man FROM The Window", desc: "A horror experience where you must hide from a mysterious presence lurking outside your home", popular: false},
+      {title: "Real Flight Simulator", desc: "A detailed flight simulation featuring realistic controls and a variety of aircraft to master", popular: false},
+      {title: "Johnny Trigger", desc: "A stylish shooter where timing is everything as you flip through the air taking down enemies", popular: false},
+      {title: "Kirby Soft & Wet", desc: "A Kirby adventure featuring classic copy abilities and physics-based platforming challenges", popular: false},
+      {title: "VS Rewrite: ROUND 2", desc: "Part two of the original fan mod, hit the notes perfectly to survive this intense musical duel", popular: false},
+      {title: "Speed Stars", desc: "Test your reflexes in this competitive athletic racing game", popular: false},
+      {title: "Stickman Destruction", desc: "Perform incredible stunts and cause maximum damage to your stickman character", popular: false},
+      {title: "Stickman Fight Ragdoll", desc: "Engage in chaotic, ragdoll-physics combat where you must swing your way to victory", popular: false},
+      {title: "Gobble", desc: "Control a hungry monster beneath the ground and swallow everything in your path", popular: false},
+      {title: "Tag", desc: "A fast-paced local multiplayer game of Tag! Run, jump, and dodge your friends", popular: false},
+      {title: "BitPlanes", desc: "A retro-inspired aerial combat game, maneuver through the skies and shoot down enemy aircraft to claim victory", popular: false},
+      {title: "Half Life: Opposing Force", desc: "The first official expansion for Valves groundbreaking Half-Life", popular: false},
+      {title: "A Difficult Game About Climbing", desc: "A physics-based platformer where you control a climber's hands to ascend a treacherous mountain", popular: false},
+      {title: "Stick War Legacy", desc: "A popular mobile strategy game where you lead armies of stick figures, managing resources like gold to build units", popular: false},
+      {title: "Buster Jam", desc: "A fast-paced, cartoon-style action-adventure game with hectic platforming and hilarious boss battles", popular: false},
+      {title: "Dungeons & Degenerate Gamblers", desc: "A pixel-art roguelike deck-builder that twists traditional blackjack", popular: false},
+      {title: "Minecraft 1.12.1", desc: "Minecraft 1.12 was the world of color update focused on expanding building options with vibrant colors", popular: false},
+      {title: "Gorilla Tag", desc: "VR-inspired physics game where you swing and climb as gorillas through colorful environments", popular: false},
+      {title: "Goblin Goopmaxxing", desc: "A dark comedy sandbox story about brewing bizarre potions and experimenting on unfortunate goblin specimens", popular: false},
+      {title: "Midnight Shift", desc: "Tense horror game where you survive a night shift with supernatural occurrences and jump scares", popular: false},
+      {title: "Orange Roulette", desc: "Colorful Russian roulette-style game with fruit-themed weapons and unpredictable outcomes", popular: false},
+      {title: "Five Nights at Winstons", desc: "Office-themed horror game inspired by FNAF with quirky animatronics and survival mechanics", popular: false},
+      {title: "Final Fantasy VII", desc: "Iconic RPG adventure with memorable characters, epic story, and turn-based combat system", popular: false},
+      // Add any missing ones from your backups here — this is already most of the visible list
+    ];
+
+    // Load custom lessons from localStorage
+    if (localStorage.getItem('customLessons')) {
+      const custom = JSON.parse(localStorage.getItem('customLessons'));
+      lessons = [...lessons, ...custom];
+    }
+
+    function renderLessons() {
+      const popDiv = document.getElementById('popular');
+      const allDiv = document.getElementById('all');
+      popDiv.innerHTML = '';
+      allDiv.innerHTML = '';
+
+      lessons.forEach(lesson => {
+        const card = `
+          <div class="card">
+            <h3>${lesson.title}</h3>
+            <p>${lesson.desc || 'Fun unblocked lesson – enjoy!'}</p>
+            <button onclick="play('${lesson.title}')">Play Lesson →</button>
+          </div>`;
+        allDiv.innerHTML += card;
+        if (lesson.popular) popDiv.innerHTML += card;
+      });
+
+      // Fake online count
+      updateCount();
+    }
+
+    function updateCount() {
+      const count = Math.floor(Math.random() * 800) + 700;
+      document.getElementById('count').textContent = count;
+      document.getElementById('count-nav').textContent = count;
+    }
+
+    function randomLesson() {
+      const rand = lessons[Math.floor(Math.random() * lessons.length)];
+      alert(`Random pick: ${rand.title}\n${rand.desc}\n\n(Replace alert with real game launch)`);
+    }
+
+    function play(title) {
+      alert(`Launching "${title}"... (add your proxy/iframe URL here)`);
+    }
+
+    // Admin trigger: Ctrl + Shift + N
+    document.addEventListener('keydown', function(e) {
+      if (e.ctrlKey && e.shiftKey && e.key.toUpperCase() === 'N') {
+        e.preventDefault();
+        document.getElementById('admin-panel').style.display = 'block';
+        document.getElementById('overlay').style.display = 'block';
+      }
+      if (e.key === 'Escape') {
+        closeAdmin();
+      }
+    });
+
+    function closeAdmin() {
+      document.getElementById('admin-panel').style.display = 'none';
+      document.getElementById('overlay').style.display = 'none';
+    }
+
+    function addLesson() {
+      const title = document.getElementById('new-title').value.trim();
+      if (!title) return alert('Title required!');
+      const desc = document.getElementById('new-desc').value.trim();
+      const popular = document.getElementById('new-popular').checked;
+
+      const newLesson = {title, desc, popular};
+      lessons.push(newLesson);
+
+      let custom = JSON.parse(localStorage.getItem('customLessons') || '[]');
+      custom.push(newLesson);
+      localStorage.setItem('customLessons', JSON.stringify(custom));
+
+      renderLessons();
+      closeAdmin();
+      alert('Added! (browser-only for now)');
+    }
+
+    // Init
+    renderLessons();
+    setInterval(updateCount, 30000);  // Update count periodically
+  </script>
+</body>
+</html>
