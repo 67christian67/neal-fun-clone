@@ -1,258 +1,1658 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Christian's Tutoring Hub | 400+ Unblocked Games & Lessons</title>
-  <style>
-    body { font-family: Arial, sans-serif; background: #0a0a0a; color: #0f0; margin: 0; padding: 0; line-height: 1.4; }
-    header { background: #000; padding: 25px; text-align: center; border-bottom: 4px solid #0f0; }
-    h1 { margin: 0; font-size: 2.2em; }
-    .nav { background: #111; padding: 12px; text-align: center; font-size: 1.1em; }
-    .nav span { margin: 0 20px; cursor: pointer; }
-    .nav button { background: #0f0; color: #000; border: none; padding: 6px 14px; cursor: pointer; border-radius: 4px; font-weight: bold; }
-    .section { padding: 30px; max-width: 1400px; margin: 0 auto; }
-    .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-    .card { background: #1a1a1a; border: 2px solid #0f0; padding: 18px; border-radius: 10px; transition: all 0.2s; }
-    .card:hover { transform: translateY(-5px); box-shadow: 0 0 20px #0f0aa; }
-    .card h3 { margin: 0 0 10px; color: #0ff; font-size: 1.3em; }
-    .card p { margin: 0 0 12px; font-size: 0.95em; color: #ccc; }
-    .card button { background: #0f0; color: #000; border: none; padding: 8px 16px; cursor: pointer; border-radius: 4px; font-weight: bold; }
-    #admin-panel { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #000; border: 3px solid #0f0; padding: 30px; z-index: 999; width: 90%; max-width: 550px; color: #0f0; box-shadow: 0 0 30px #0f0; }
-    #admin-panel input, #admin-panel textarea { width: 100%; margin: 10px 0; padding: 10px; background: #111; color: #0f0; border: 1px solid #0f0; border-radius: 4px; box-sizing: border-box; }
-    #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 998; }
-  </style>
-</head>
-<body>
-  <header>
-    <h1>🌟 Noah's Tutoring Hub | 400+ Unblocked Games & Lessons 🌟</h1>
-    <p id="online">Online: <span id="count">868</span> • Alr bro ts was not the wind</p>
-  </header>
-
-  <div class="nav">
-    <span>Online: <span id="count-nav">868</span></span>
-    <span onclick="randomLesson()">🎲 Random Lesson</span>
-    <span>Settings (Ctrl+Shift+N for admin)</span>
-    <span onclick="location.reload()">Refresh</span>
-    <span>About:Blank</span>
-  </div>
-
-  <div class="section">
-    <h2>POPULAR LESSONS</h2>
-    <div id="popular" class="cards"></div>
-  </div>
-
-  <div class="section">
-    <h2>ALL LESSONS (367 shown of 367+)</h2>
-    <div id="all" class="cards"></div>
-  </div>
-
-  <!-- Admin Panel -->
-  <div id="overlay" onclick="closeAdmin()"></div>
-  <div id="admin-panel">
-    <h2>Admin: Add New Lesson</h2>
-    <input id="new-title" placeholder="Lesson Title (required)" required>
-    <textarea id="new-desc" placeholder="Short description (optional)"></textarea>
-    <label><input type="checkbox" id="new-popular"> Mark as Popular</label>
-    <br><br>
-    <button onclick="addLesson()">Add Lesson</button>
-    <button onclick="closeAdmin()" style="background:#f44; margin-left:10px;">Cancel</button>
-    <p style="font-size:0.8em; color:#888; margin-top:15px;">Changes saved in browser (localStorage) — visible only to you until shared/exported.</p>
-  </div>
-
-  <script>
-    // Full lessons list from your site
-    let lessons = [
-      {title: "Balatro", desc: "Build insane poker hands with special Joker cards", popular: true},
-      {title: "Cloverpit", desc: "A dark gambling rogue-lite. Beat the slot machine, pay your debts, and escape the pit", popular: true},
-      {title: "Peaks of Yore", desc: "A first-person physics-based climbing game set in the great outdoors", popular: true},
-      {title: "Untitled Goose Game", desc: "A game where you are a goose let loose on an unsuspecting village terroizing EVERYONE", popular: true},
-      {title: "Plants Vs Zombies 2", desc: "Defend your lawn with crazy plants against fun-loving zombies across time", popular: true},
-      {title: "Hotline Miami", desc: "Fast-paced top-down action combat", popular: true},
-      {title: "Backrooms", desc: "Liminal space exploration", popular: true},
-      {title: "Friday Night Funkin", desc: "Rhythm music battles", popular: true},
-      {title: "Grand Theft Auto Vice City", desc: "An 80s-inspired open-world crime saga. Drive fast, build a criminal empire, and shoot your way to the top in a neon-soaked city", popular: true},
-      {title: "Superhot", desc: "Time only moves when you move, strategy and aim combine in this unique FPS", popular: true},
-      {title: "A Bite at Freddy's", desc: "A tense horror survival game where you must monitor security cameras and manage power to survive the night against animatronic threats.", popular: false},
-      {title: "Wheely", desc: "A charming physics-based puzzle game where you help a small red car named Wheely overcome obstacles and reach his goal.", popular: false},
-      {title: "The World's Hardest Game", desc: "Test your skills and patience in this notoriously difficult precision puzzle game where you must navigate through treacherous levels.", popular: false},
-      {title: "The World's Hardest Game 2", desc: "The sequel to the original challenge, featuring even more complex levels and obstacles to master.", popular: false},
-      {title: "The World's Hardest Game 3", desc: "A third installment of the brutal puzzle series, pushing your reflexes and strategy to their limits.", popular: false},
-      {title: "The World's Hardest Game 4", desc: "The ultimate test of endurance and precision in the long-running series of incredibly tough levels.", popular: false},
-      {title: "Escape Road City 2", desc: "Drive fast and evade pursuit in this high-octane city racing and escape simulation.", popular: false},
-      {title: "Lumines II", desc: "A stylish rhythm-puzzle game where you match colored blocks to the beat of an evolving soundtrack.", popular: false},
-      {title: "Bank Robbery 2", desc: "Plan and execute the perfect heist in this tense sequel to the original tactical robbery game.", popular: false},
-      {title: "Bank Robbery 3", desc: "Take your criminal career to the next level with more complex vaults and advanced security systems to bypass.", popular: false},
-      {title: "Madness Combat: Project Nexus", desc: "Experience the brutal action of the Madness Combat universe in this intense fan-made Undertale-style duel.", popular: false},
-      {title: "Alien Hominid", desc: "The classic fast-paced run-and-gun shooter. Fight off secret agents and reclaim your UFO in this iconic indie hit.", popular: false},
-      {title: "Customer Support", desc: "A quirky and tense simulation where you must manage increasingly strange requests while keeping your cool.", popular: false},
-      {title: "The Deadseat", desc: "A haunting atmosphere-driven experience. Navigate through the darkness and uncover the secrets of the deadseat.", popular: false},
-      {title: "Fireboy and Watergirl: Forest Temple", desc: "The original cooperative puzzle platformer. Work together to navigate the Forest Temple and collect all the gems.", popular: false},
-      {title: "Deltatraveler", desc: "A fan-made Undertale and Deltarune adventure. Join Kris, Susie, and Noelle as they travel through different worlds.", popular: false},
-      {title: "Needy Streamer Overload", desc: "Manage the life of a young girl trying to become the #1 Internet Angel in this psychological multi-ending sim.", popular: false},
-      {title: "Pizza Tower", desc: "A high-octane 2D platformer inspired by Wario Land. Move fast, smash through walls, and save your pizzeria!", popular: false},
-      {title: "TileTopia", desc: "A relaxing yet challenging puzzle game. Arrange tiles and clear the board in this addictive strategy experience.", popular: false},
-      {title: "Earn to Die", desc: "Drive your way through a zombie apocalypse, upgrading your car to mow down the undead and reach safety.", popular: false},
-      {title: "Earn to Die 2", desc: "The massive sequel featuring a new story mode, destructible vehicles, and even more zombies to smash through.", popular: false},
-      {title: "Bart Blast", desc: "Join Bart in a high-octane explosive adventure. Use timing and strategy to blast your way through challenging levels.", popular: false},
-      {title: "Bendy and the Ink Machine: All Chapters", desc: "Explore the decayed animation studio and escape the ink demon in this complete horror saga.", popular: false},
-      {title: "Gacha Life", desc: "Create your own anime-style characters and dress them up in your favorite fashion outfits!", popular: false},
-      {title: "Gacha Verse", desc: "The sequel to Gacha World. Customize your heroes, battle in the arena, and explore a vast new world.", popular: false},
-      {title: "Tung Sahur Horror", desc: "A terrifying stealth-horror game based on the tradition of waking people for Sahur. Don't let the entities catch you.", popular: false},
-      {title: "Horror Tale", desc: "A scary adventure game where you must solve puzzles and save children from a mysterious masked kidnapper.", popular: false},
-      {title: "Dumb Ways to Die", desc: "A collection of dangerous mini-games where you must stay alive to keep your beans safe.", popular: false},
-      {title: "Bloons Tower Defense 1", desc: "The original classic that started the bloon-popping phenomenon.", popular: false},
-      {title: "Bloons Tower Defense 2", desc: "More towers and tracks. Experience the sequel to the tower defense hit.", popular: false},
-      {title: "Bloons Tower Defense 3", desc: "The third installment featuring new monkey towers and tougher bloons.", popular: false},
-      {title: "Bloons Tower Defense 4", desc: "Massive graphical upgrades and career ranks for serious tower defense players.", popular: false},
-      {title: "Bloons Tower Defense 5", desc: "The ultimate BTD experience with daily challenges and specialized building upgrades.", popular: false},
-      {title: "Brotato", desc: "A top-down arena shooter roguelite where you play a potato wielding up to 6 weapons at a time to fight off hordes of aliens", popular: false},
-      {title: "Endoparasitic 2", desc: "The intense sequel where you must survive a research facility using only one arm while fighting off mutated horrors", popular: false},
-      {title: "Endoparasitic", desc: "A unique tactical horror game where you crawl through a nightmare using a single limb to move, reload, and shoot", popular: false},
-      {title: "Baby Sniper In Vietnam", desc: "A tactical sniping game where you must complete various missions and take out targets with precision and stealth", popular: false},
-      {title: "Shift at Midnight", desc: "Survive a terrifying night shift in this claustrophobic psychological horror experience", popular: false},
-      {title: "Road of Fury", desc: "Battle across a wasteland in this high-octane vehicular combat game", popular: false},
-      {title: "Roulette Hero", desc: "Take a gamble in this intense game of chance and survival", popular: false},
-      {title: "Fear Assessment", desc: "Face your phobias in this psychological test of courage and reflexes", popular: false},
-      {title: "Dimension Incident", desc: "A surreal first-person platformer where you navigate through shifting dimensions", popular: false},
-      {title: "Raldi's Crackhouse", desc: "A chaotic parody of Baldi's Basics featuring Raldi and even stranger school rules", popular: false},
-      {title: "Christmas Massacre", desc: "An 80s-inspired slasher horror game where you must satisfy a talking Christmas tree", popular: false},
-      {title: "Boxing Random", desc: "Wacky physics-based boxing where one hit to the head wins the round", popular: false},
-      {title: "Volley Random", desc: "Fun ragdoll volleyball with random variations in every round", popular: false},
-      {title: "Basket Random", desc: "A chaotic two-player basketball game with ragdoll physics and random environments", popular: false},
-      {title: "Soccer Random", desc: "Soccer but with one button, crazy physics, and changing fields and players", popular: false},
-      {title: "Little Big Planet", desc: "A whimsical world of platforming and creativity where you can play, create, and share your own levels while playing as sackboy", popular: false},
-      {title: "The Binding of Isaac: Rebirth", desc: "A randomly generated action RPG shooter with heavy rogue-like elements. Follow Isaac on his journey to escape his mother", popular: false},
-      {title: "Littlest Pet Shop City Friends", desc: "Explore the city, play fun mini-games, and collect adorable pets in this charming adventure", popular: false},
-      {title: "Silent Hill", desc: "The psychological horror classic. Navigate the fog-filled town and face your deepest fears", popular: false},
-      {title: "Dad 'n Me", desc: "A classic side-scrolling beat 'em up where you play as a purple bully causing chaos at the park", popular: false},
-      {title: "Five Nights at Candy's 1", desc: "A popular fan-made horror game inspired by FNAF, featuring Candy the Cat and his robotic friends", popular: false},
-      {title: "Five Nights at Candy's 2", desc: "The sequel to the fan-made hit, with new mechanics and even more terrifying animatronics to avoid", popular: false},
-      {title: "Deltarune Chapters 3 & 4", desc: "A journey continues in the latest chapters of Deltarun, explore new areas and face new challenges with Kris and friends", popular: false},
-      {title: "Earthbound", desc: "An RPG where a young boy named Ness and his friends must save the world from an intergalactic threat", popular: false},
-      {title: "Hamtaro: Ham-Ham Heartbreak", desc: "Help Hamtaro and Bijou reunite Ham-Hams and repair broken hearts in this charming adventure", popular: false},
-      {title: "Class of '09", desc: "An anti-visual novel where you navigate the toxic social landscape of high school with dark humor", popular: false},
-      {title: "Antonblast", desc: "An explosive, high-speed action platformer where you must reclaim your prized spirit collection", popular: false},
-      {title: "Super Monkey Ball", desc: "Roll your ball through challenging suspended courses, reach the goal and collect bannanas", popular: false},
-      {title: "Iron Lung", desc: "Pilot a cramped submarine through an ocean of blood on an alien moon in a claustrophobic space", popular: false},
-      {title: "OMORI", desc: "A world full of colorful friends and foes as you navigate through a surreal psychological horror adventure", popular: false},
-      {title: "Fear & Hunger", desc: "A brutal and unforgiving dungeon crawler that explores dark themes and challenges", popular: false},
-      {title: "Doodle Jump", desc: "The classic arcade hit! Guide the Doodler on a journey up a sheet of graph paper", popular: false},
-      {title: "Karlson", desc: "A physics-based parkour action game where you must use movement and weapons to reach the milk at the end of the level", popular: false},
-      {title: "Toss The Turtle", desc: "Blast off and toss your turtle as far as possible using cannons, bombs, and jetpacks in this classic launcher game", popular: false},
-      {title: "Survivor.io", desc: "Battle against thousands of zombies and survive as long as possible by upgrading your weapons and skills", popular: false},
-      {title: "People Playground", desc: "A physics-based sandbox where you can experiment with various tools, weapons, and characters in a large open space", popular: false},
-      {title: "Papers, Please", desc: "Glory to Arstotzka. Work as an immigration inspector and decide who enters while managing your family's survival", popular: false},
-      {title: "Beeswarm Simulator (html version)", desc: "That one roblox game where you collect bees as slaves, except someone remade it in html", popular: false},
-      {title: "Time Shooter 3: SWAT", desc: "Enter the role of a SWAT officer in this time-bending tactical shooter", popular: false},
-      {title: "Time Shooter 2", desc: "The sequel to the time-bending shooter with more weapons, more enemies, and more complex levels", popular: false},
-      {title: "Time Shooter 1", desc: "A minimalist shooter where time stops when you do, carefully navigate through a room of enemies", popular: false},
-      {title: "The Man FROM The Window", desc: "A horror experience where you must hide from a mysterious presence lurking outside your home", popular: false},
-      {title: "Real Flight Simulator", desc: "A detailed flight simulation featuring realistic controls and a variety of aircraft to master", popular: false},
-      {title: "Johnny Trigger", desc: "A stylish shooter where timing is everything as you flip through the air taking down enemies", popular: false},
-      {title: "Kirby Soft & Wet", desc: "A Kirby adventure featuring classic copy abilities and physics-based platforming challenges", popular: false},
-      {title: "VS Rewrite: ROUND 2", desc: "Part two of the original fan mod, hit the notes perfectly to survive this intense musical duel", popular: false},
-      {title: "Speed Stars", desc: "Test your reflexes in this competitive athletic racing game", popular: false},
-      {title: "Stickman Destruction", desc: "Perform incredible stunts and cause maximum damage to your stickman character", popular: false},
-      {title: "Stickman Fight Ragdoll", desc: "Engage in chaotic, ragdoll-physics combat where you must swing your way to victory", popular: false},
-      {title: "Gobble", desc: "Control a hungry monster beneath the ground and swallow everything in your path", popular: false},
-      {title: "Tag", desc: "A fast-paced local multiplayer game of Tag! Run, jump, and dodge your friends", popular: false},
-      {title: "BitPlanes", desc: "A retro-inspired aerial combat game, maneuver through the skies and shoot down enemy aircraft to claim victory", popular: false},
-      {title: "Half Life: Opposing Force", desc: "The first official expansion for Valves groundbreaking Half-Life", popular: false},
-      {title: "A Difficult Game About Climbing", desc: "A physics-based platformer where you control a climber's hands to ascend a treacherous mountain", popular: false},
-      {title: "Stick War Legacy", desc: "A popular mobile strategy game where you lead armies of stick figures, managing resources like gold to build units", popular: false},
-      {title: "Buster Jam", desc: "A fast-paced, cartoon-style action-adventure game with hectic platforming and hilarious boss battles", popular: false},
-      {title: "Dungeons & Degenerate Gamblers", desc: "A pixel-art roguelike deck-builder that twists traditional blackjack", popular: false},
-      {title: "Minecraft 1.12.1", desc: "Minecraft 1.12 was the world of color update focused on expanding building options with vibrant colors", popular: false},
-      {title: "Gorilla Tag", desc: "VR-inspired physics game where you swing and climb as gorillas through colorful environments", popular: false},
-      {title: "Goblin Goopmaxxing", desc: "A dark comedy sandbox story about brewing bizarre potions and experimenting on unfortunate goblin specimens", popular: false},
-      {title: "Midnight Shift", desc: "Tense horror game where you survive a night shift with supernatural occurrences and jump scares", popular: false},
-      {title: "Orange Roulette", desc: "Colorful Russian roulette-style game with fruit-themed weapons and unpredictable outcomes", popular: false},
-      {title: "Five Nights at Winstons", desc: "Office-themed horror game inspired by FNAF with quirky animatronics and survival mechanics", popular: false},
-      {title: "Final Fantasy VII", desc: "Iconic RPG adventure with memorable characters, epic story, and turn-based combat system", popular: false},
-      // Add any missing ones from your backups here — this is already most of the visible list
-    ];
-
-    // Load custom lessons from localStorage
-    if (localStorage.getItem('customLessons')) {
-      const custom = JSON.parse(localStorage.getItem('customLessons'));
-      lessons = [...lessons, ...custom];
-    }
-
-    function renderLessons() {
-      const popDiv = document.getElementById('popular');
-      const allDiv = document.getElementById('all');
-      popDiv.innerHTML = '';
-      allDiv.innerHTML = '';
-
-      lessons.forEach(lesson => {
-        const card = `
-          <div class="card">
-            <h3>${lesson.title}</h3>
-            <p>${lesson.desc || 'Fun unblocked lesson – enjoy!'}</p>
-            <button onclick="play('${lesson.title}')">Play Lesson →</button>
-          </div>`;
-        allDiv.innerHTML += card;
-        if (lesson.popular) popDiv.innerHTML += card;
-      });
-
-      // Fake online count
-      updateCount();
-    }
-
-    function updateCount() {
-      const count = Math.floor(Math.random() * 800) + 700;
-      document.getElementById('count').textContent = count;
-      document.getElementById('count-nav').textContent = count;
-    }
-
-    function randomLesson() {
-      const rand = lessons[Math.floor(Math.random() * lessons.length)];
-      alert(`Random pick: ${rand.title}\n${rand.desc}\n\n(Replace alert with real game launch)`);
-    }
-
-    function play(title) {
-      alert(`Launching "${title}"... (add your proxy/iframe URL here)`);
-    }
-
-    // Admin trigger: Ctrl + Shift + N
-    document.addEventListener('keydown', function(e) {
-      if (e.ctrlKey && e.shiftKey && e.key.toUpperCase() === 'N') {
-        e.preventDefault();
-        document.getElementById('admin-panel').style.display = 'block';
-        document.getElementById('overlay').style.display = 'block';
-      }
-      if (e.key === 'Escape') {
-        closeAdmin();
-      }
-    });
-
-    function closeAdmin() {
-      document.getElementById('admin-panel').style.display = 'none';
-      document.getElementById('overlay').style.display = 'none';
-    }
-
-    function addLesson() {
-      const title = document.getElementById('new-title').value.trim();
-      if (!title) return alert('Title required!');
-      const desc = document.getElementById('new-desc').value.trim();
-      const popular = document.getElementById('new-popular').checked;
-
-      const newLesson = {title, desc, popular};
-      lessons.push(newLesson);
-
-      let custom = JSON.parse(localStorage.getItem('customLessons') || '[]');
-      custom.push(newLesson);
-      localStorage.setItem('customLessons', JSON.stringify(custom));
-
-      renderLessons();
-      closeAdmin();
-      alert('Added! (browser-only for now)');
-    }
-
-    // Init
-    renderLessons();
-    setInterval(updateCount, 30000);  // Update count periodically
-  </script>
-</body>
+  <head>
+    <script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6233004140854685" crossorigin="anonymous">
+    </script>
+    <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-4QPXKLD48W">
+    </script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag(&#39;js&#39;, new Date());
+    gtag(&#39;config&#39;, &#39;G-4QPXKLD48W&#39;, { page_title: document.title, page_location: window.location.href });
+    </script>
+    <meta charset="UTF-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>
+      Noahs Tutoring | Math
+    </title>
+    <link href="cuh.png" id="siteFavicon" rel="icon" type="image/x-icon" />
+    <link href="cuh.png" rel="shortcut icon" />
+    <link href="cuh.png" rel="apple-touch-icon" />
+    <meta content="#c27c15" name="theme-color" />
+    <meta content="Noah&#39;s Tutoring Hub" property="og:site_name" />
+    <meta content="Noah&#39;s Tutoring Hub | 400+ Unblocked Games &amp; Lessons" property="og:title" />
+    <meta content="Access hundreds of unblocked games, educational tools, and math lessons. The ultimate hub for students!" property="og:description" />
+    <meta content="https://noahs-calculus-tutor.pages.dev/" property="og:url" />
+    <meta content="website" property="og:type" />
+    <meta content="https://raw.githubusercontent.com/NoahsAmazingTutoringHelp/Noahs-Calculus-Tutor/refs/heads/master/images/OG%20noahstutoring.png" property="og:image" />
+    <meta content="1200" property="og:image:width" />
+    <meta content="630" property="og:image:height" />
+    <meta content="Noah&#39;s Tutoring Hub - Unblocked Games &amp; Educational Resources" property="og:image:alt" />
+    <meta content="en_US" property="og:locale" />
+    <meta content="summary_large_image" name="twitter:card" />
+    <meta content="Noah&#39;s Tutoring Hub | 400+ Unblocked Games" name="twitter:title" />
+    <meta content="The best collection of unblocked games and educational resources for students." name="twitter:description" />
+    <meta content="https://raw.githubusercontent.com/NoahsAmazingTutoringHelp/Noahs-Calculus-Tutor/refs/heads/master/images/OG%20noahstutoring.png" name="twitter:image" />
+    <meta content="Noah&#39;s Tutoring Hub Banner" name="twitter:image:alt" />
+    <meta content="Noah&#39;s Tutoring Hub - Access hundreds of unblocked games, math lessons, and educational resources. Perfect for students looking for fun learning tools." name="description" />
+    <meta content="unblocked games, tutoring, math help, educational games, student resources, online learning" name="keywords" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <link href="css/style.css?v=20260311142800" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="custom-scrollbar">
+      <div id="custom-scrollbar-track">
+        <div id="custom-scrollbar-thumb">
+        </div>
+      </div>
+    </div>
+    <div id="custom-cursor">
+    </div>
+    <div id="background-root">
+      <div id="starfield-layer">
+      </div>
+      <canvas id="matrix-bg">
+      </canvas>
+      <div id="paths-layer">
+      </div>
+      <div id="background-glow">
+      </div>
+      <div id="background-vignette">
+      </div>
+    </div>
+    <div class="container" id="main-container">
+      <header>
+        <div class="top-bar">
+          <div class="logo-container" onclick="switchTab(&#39;lessons&#39;)" role="button" tabindex="0" onkeydown="if(event.key===&#39;Enter&#39;||event.key===&#39; &#39;){event.preventDefault();switchTab(&#39;lessons&#39;);}">
+            <img alt="Noah&#39;s Tutoring Hub" class="logo" src="https://cdn.jsdelivr.net/gh/NoahsAmazingTutoringHelp/Noahs-Calculus-Tutor/images/logo.png" />
+          </div>
+          <div class="top-nav-actions">
+            <div class="nav-tabs">
+              <div class="nav-tab active" id="lessonsTab" onclick="switchTab(&#39;lessons&#39;)">
+                LESSONS
+              </div>
+              <div class="nav-tab" id="chatTab" onclick="switchTab(&#39;chat&#39;)">
+                CHAT
+              </div>
+              <div class="nav-tab" id="accountTab" onclick="switchTab(&#39;account&#39;)">
+                ACCOUNT
+              </div>
+              <div class="nav-tab" hidden="" id="adminTab" onclick="switchTab(&#39;admin&#39;)">
+                ADMIN
+              </div>
+              <div class="nav-tab" id="settingsTab" onclick="switchTab(&#39;settings&#39;)">
+                SETTINGS
+              </div>
+              <div class="nav-tab" id="videoTab" onclick="switchTab(&#39;video&#39;)">
+                VIDEO
+              </div>
+              <div class="nav-tab" id="partnersTab" onclick="switchTab(&#39;partners&#39;)">
+                PARTNERS
+              </div>
+            </div>
+          </div>
+          <div class="top-right-cluster">
+            <div class="live-counter" id="liveCounter" data-state="loading" aria-live="polite" aria-label="Live online users">
+              <span class="live-counter-label">              Online:
+</span>
+              <span class="live-counter-value" id="liveCounterValue">              ...
+</span>
+            </div>
+            <div class="social-icons">
+              <a href="https://discord.gg/pCGQ8vrKza" target="_blank" rel="noopener noreferrer">              <i class="fab fa-discord"></i>
+</a>
+              <a href="https://github.com/NoahsAmazingTutoringHelp" target="_blank" rel="noopener noreferrer">              <i class="fab fa-github"></i>
+</a>
+              <a href="https://www.tiktok.com/@noahstutoringhub" target="_blank" rel="noopener noreferrer">              <i class="fab fa-tiktok"></i>
+</a>
+              <a href="https://www.youtube.com/@noahstutoringhub" target="_blank" rel="noopener noreferrer">              <i class="fab fa-youtube"></i>
+</a>
+            </div>
+          </div>
+        </div>
+      </header>
+      <section id="home-section">
+        <div class="home-hero">
+          <div class="home-logo-wrap" id="homeLogoWrap">
+            <img alt="Noah&#39;s Tutoring Hub" class="home-logo" src="https://cdn.jsdelivr.net/gh/NoahsAmazingTutoringHelp/Noahs-Calculus-Tutor/images/logo.png" />
+            <div class="home-logo-shine" id="homeLogoShine">
+            </div>
+          </div>
+          <p class="home-subtitle">
+            <span id="typing-quote"></span>
+            <span class="cursor">            |
+</span>
+          </p>
+        </div>
+        <!-- Stats row -->
+        <div class="home-stats-row">
+          <div class="home-stat">
+            <span class="home-stat-number" id="homeStatGames">            400+
+</span>
+            <span class="home-stat-label">            Lessons
+</span>
+          </div>
+          <div class="home-stat-divider">
+          </div>
+          <div class="home-stat">
+            <span class="home-stat-number" id="homeStatOnline">            —
+</span>
+            <span class="home-stat-label">            Online Now
+</span>
+          </div>
+          <div class="home-stat-divider">
+          </div>
+          <div class="home-stat">
+            <span class="home-stat-number">            13
+</span>
+            <span class="home-stat-label">            Partners
+</span>
+          </div>
+        </div>
+        <div class="home-popular-wrap">
+          <h2>
+            POPULAR LESSONS
+          </h2>
+          <div class="home-carousel" id="homePopularCarousel">
+          </div>
+        </div>
+      </section>
+      <div class="ad-container banner-ad">
+        <div class="ad-label">
+          ADVERTISEMENT
+        </div>
+        <script>
+          atOptions = {
+          &#39;key&#39;: &#39;17597ffcacd1da248155d2da320dc2e5&#39;,
+          &#39;format&#39;: &#39;iframe&#39;,
+          &#39;height&#39;: 90,
+          &#39;width&#39;: 728,
+          &#39;params&#39;: {}
+        };
+        </script>
+        <script src="https://joyfullybarn.com/17597ffcacd1da248155d2da320dc2e5/invoke.js">
+        </script>
+      </div>
+      <section id="all-lessons">
+        <div class="lessons-header">
+          <h2>
+            ALL LESSONS
+          </h2>
+          <span class="lessons-game-count" id="lessonsGameCount"></span>
+        </div>
+        <div class="search-container">
+          <input class="search-box" id="searchInput" placeholder="Search lessons..." type="text" />
+          <div class="search-icon">
+            <i class="fas fa-search"></i>
+          </div>
+        </div>
+        <div class="search-stats" id="searchStats">
+        </div>
+        <div class="sorter-wrapper">
+          <select class="sort-select" id="sortSelect">
+            <option value="default">
+              [NEWEST]
+            </option>
+            <option value="alphabetical">
+              [A - Z]
+            </option>
+            <option value="reverse">
+              [Z - A]
+            </option>
+            <option value="random">
+              [RANDOMIZED]
+            </option>
+          </select>
+          <div class="custom-arrow">
+            ▼
+          </div>
+        </div>
+        <div class="lessons-grid" id="allLessonsGrid">
+        </div>
+      </section>
+      <div class="ad-container banner-ad">
+        <div class="ad-label">
+          ADVERTISEMENT
+        </div>
+        <script>
+          atOptions = {
+          &#39;key&#39;: &#39;17597ffcacd1da248155d2da320dc2e5&#39;,
+          &#39;format&#39;: &#39;iframe&#39;,
+          &#39;height&#39;: 90,
+          &#39;width&#39;: 728,
+          &#39;params&#39;: {}
+        };
+        </script>
+        <script src="https://joyfullybarn.com/17597ffcacd1da248155d2da320dc2e5/invoke.js">
+        </script>
+      </div>
+      <section class="partners-section" id="partners-section">
+        <h2>
+          PARTNERS
+        </h2>
+        <div class="partners-grid">
+          <div class="partner-card">
+            <img alt="Partner Logo" class="partner-image" src="https://cdn.jsdelivr.net/gh/NoahsAmazingTutoringHelp/reimagined-octo-winner@main/pictures/9.jpg" />
+            <h3 class="partner-title">
+              1Key
+            </h3>
+            <p class="partner-desc">
+              Highly customizable and stable. We may not have the best games or bypasses,
+            but we&#39;re always open to suggestions, continuously improving, and building a strong community.
+            </p>
+            <div class="partner-buttons">
+              <button class="discord-btn" onclick="window.open(&#39;https://discord.gg/XK8vQGrfqv&#39;, &#39;_blank&#39;)">
+                <i class="fab fa-discord"></i>
+              </button>
+              <button class="visit-btn" onclick="window.open(&#39;https://1key.lol&#39;, &#39;_blank&#39;)">
+                VISIT SITE
+              </button>
+            </div>
+          </div>
+          <div class="partner-card">
+            <img alt="Partner Logo" class="partner-image" src="https://cdn.jsdelivr.net/gh/NoahsAmazingTutoringHelp/reimagined-octo-winner@main/pictures/13.png" />
+            <h3 class="partner-title">
+              DEMON
+            </h3>
+            <p class="partner-desc">
+              DEMON is a high-speed proxy and browser hub featuring exclusive &#34;Turbo Bypass&#34; technology to defeat Securly
+            and Lightspeed with a dedicated community and &#34;god domain&#34; generator.
+            </p>
+            <div class="partner-buttons">
+              <button class="discord-btn" onclick="window.open(&#39;https://discord.gg/YGAbQZj6aH&#39;, &#39;_blank&#39;)">
+                <i class="fab fa-discord"></i>
+              </button>
+              <button class="visit-btn" onclick="window.open(&#39;https://demonzero.space/&#39;, &#39;_blank&#39;)">
+                VISIT SITE
+              </button>
+            </div>
+          </div>
+          <div class="partner-card">
+            <img alt="Partner Logo" class="partner-image" src="https://cdn.jsdelivr.net/gh/NoahsAmazingTutoringHelp/reimagined-octo-winner@main/pictures/12.png" />
+            <h3 class="partner-title">
+              Network Unity
+            </h3>
+            <p class="partner-desc">
+              A proxy and entertainment hub offering unblockable chat, a frequently updated game library, and an
+            extensive, request-driven movie collection with subtitles.
+            </p>
+            <div class="partner-buttons">
+              <button class="discord-btn" onclick="window.open(&#39;https://discord.gg/ky59RqGjun&#39;, &#39;_blank&#39;)">
+                <i class="fab fa-discord"></i>
+              </button>
+              <button class="visit-btn" onclick="window.open(&#39;https://sites.google.com/view/novasremade/home&#39;, &#39;_blank&#39;)">
+                VISIT SITE
+              </button>
+            </div>
+          </div>
+          <div class="partner-card">
+            <img alt="Partner Logo" class="partner-image" src="https://cdn.jsdelivr.net/gh/NoahsAmazingTutoringHelp/reimagined-octo-winner@main/pictures/11.png" />
+            <h3 class="partner-title">
+              Hydra Network
+            </h3>
+            <p class="partner-desc">
+              A high-performance bypass network featuring triple-proxy support, a custom checker bot, and specialized
+            unblocking for Lightspeed and ContentKeeper.
+            </p>
+            <div class="partner-buttons">
+              <button class="discord-btn" onclick="window.open(&#39;https://discord.gg/bGkBUGSgDT&#39;, &#39;_blank&#39;)">
+                <i class="fab fa-discord"></i>
+              </button>
+              <button class="visit-btn" onclick="window.open(&#39;https://discord.gg/bGkBUGSgDT&#39;, &#39;_blank&#39;)">
+                VISIT SITE
+              </button>
+            </div>
+          </div>
+          <div class="partner-card">
+            <img alt="Partner Logo" class="partner-image" src="https://cdn.jsdelivr.net/gh/NoahsAmazingTutoringHelp/reimagined-octo-winner@main/pictures/14.png" />
+            <h3 class="partner-title">
+              TGLSC Density 4
+            </h3>
+            <p class="partner-desc">
+              The next generation of school accessible content. Smoother, faster, and more connected than ever before.
+            A Plethora of games, proxies, and MORE!
+            </p>
+            <div class="partner-buttons">
+              <button class="discord-btn" onclick="window.open(&#39;https://discord.gg/PCs3RwqDn4&#39;, &#39;_blank&#39;)">
+                <i class="fab fa-discord"></i>
+              </button>
+              <button class="visit-btn" onclick="window.open(&#39;https://anything-here.glseries.net/&#39;, &#39;_blank&#39;)">
+                VISIT SITE
+              </button>
+            </div>
+          </div>
+          <div class="partner-card">
+            <img alt="Partner Logo" class="partner-image" src="https://cdn.jsdelivr.net/gh/NoahsAmazingTutoringHelp/reimagined-octo-winner@main/pictures/10.png" />
+            <h3 class="partner-title">
+              Cherri V2
+            </h3>
+            <p class="partner-desc">
+              A feature packed games website including over 600 games,
+            movies, TV, over 10M songs, a blazing fast browser, cloud saves, profiles, chatrooms, and more!
+            </p>
+            <div class="partner-buttons">
+              <button class="discord-btn" onclick="window.open(&#39;https://discord.gg/hUYzETaQ9U&#39;, &#39;_blank&#39;)">
+                <i class="fab fa-discord"></i>
+              </button>
+              <button class="visit-btn" onclick="window.open(&#39;https://cherrion.top/&#39;, &#39;_blank&#39;)">
+                VISIT SITE
+              </button>
+            </div>
+          </div>
+          <div class="partner-card">
+            <img alt="Partner Logo" class="partner-image" src="https://raw.githubusercontent.com/NoahsAmazingTutoringHelp/reimagined-octo-winner/refs/heads/main/pictures/8.jpg" />
+            <h3 class="partner-title">
+              Astra
+            </h3>
+            <p class="partner-desc">
+              The best cloudmoon bypass out there by far!! With Clash Royale, Youtube, Chrome Roblox, &amp; Fortnite (We know
+            others also have that, but we&#39;re faster)
+            </p>
+            <div class="partner-buttons">
+              <button class="discord-btn" onclick="window.open(&#39;https://discord.gg/Zcqvn8K2Ak&#39;, &#39;_blank&#39;)">
+                <i class="fab fa-discord"></i>
+              </button>
+              <button class="visit-btn" onclick="window.open(&#39;https://astra-education.space/&#39;, &#39;_blank&#39;)">
+                VISIT SITE
+              </button>
+            </div>
+          </div>
+          <div class="partner-card">
+            <img alt="Partner Logo" class="partner-image" src="https://raw.githubusercontent.com/NoahsAmazingTutoringHelp/reimagined-octo-winner/refs/heads/main/pictures/7.gif" />
+            <h3 class="partner-title">
+              LUNA
+            </h3>
+            <p class="partner-desc">
+              The best cloudmoon bypass out there!!! With lessons like, Roblox, Clash Royale, Andriod Emulators and MUCH
+            MORE!!
+            </p>
+            <div class="partner-buttons">
+              <button class="discord-btn" onclick="window.open(&#39;https://discord.gg/1un4&#39;, &#39;_blank&#39;)">
+                <i class="fab fa-discord"></i>
+              </button>
+              <button class="visit-btn" onclick="window.open(&#39;https://luna.loan/&#39;, &#39;_blank&#39;)">
+                VISIT SITE
+              </button>
+            </div>
+          </div>
+          <div class="partner-card">
+            <img alt="Partner Logo" class="partner-image" src="https://cdn.jsdelivr.net/gh/NoahsAmazingTutoringHelp/reimagined-octo-winner@main/pictures/1.jpg" />
+            <h3 class="partner-title">
+              Bloxcraft UBG
+            </h3>
+            <p class="partner-desc">
+              Welcome to Bloxcraft the Ultimate UBG site your all in-one learning hub with hundreds of
+            lessons and other UBGs right at your fingertips!
+            </p>
+            <div class="partner-buttons">
+              <button class="discord-btn" onclick="window.open(&#39;https://discord.gg/sqPFYEsz8F&#39;, &#39;_blank&#39;)">
+                <i class="fab fa-discord"></i>
+              </button>
+              <button class="visit-btn" onclick="window.open(&#39;https://bloxcraft-ubg.pages.dev/&#39;, &#39;_blank&#39;)">
+                VISIT SITE
+              </button>
+            </div>
+          </div>
+          <div class="partner-card">
+            <img alt="Partner Logo" class="partner-image" src="https://cdn.jsdelivr.net/gh/NoahsAmazingTutoringHelp/reimagined-octo-winner@main/pictures/2.jpg" />
+            <h3 class="partner-title">
+              Glacier Arcade
+            </h3>
+            <p class="partner-desc">
+              Premium unblocked games with 400+ titles including Buckshot Roulette, Ultrakill, All FNAF games, and
+            Minecraft. Smooth design, instant play.
+            </p>
+            <div class="partner-buttons">
+              <button class="discord-btn" onclick="window.open(&#39;https://discord.gg/zfBZvZUHmR&#39;, &#39;_blank&#39;)">
+                <i class="fab fa-discord"></i>
+              </button>
+              <button class="visit-btn" onclick="window.open(&#39;https://glacierarcade.xyz/&#39;, &#39;_blank&#39;)">
+                VISIT SITE
+              </button>
+            </div>
+          </div>
+          <div class="partner-card">
+            <img alt="Partner Logo" class="partner-image" src="https://cdn.jsdelivr.net/gh/NoahsAmazingTutoringHelp/reimagined-octo-winner@main/pictures/3.jpg" />
+            <h3 class="partner-title">
+              Rosin
+            </h3>
+            <p class="partner-desc">
+              Rosin, your one-stop for 567+ unblocked games with clean UI, accounts, and BYOD. All this and much more.
+            Made with ❤️ for gamers everywhere.
+            </p>
+            <div class="partner-buttons">
+              <button class="discord-btn" onclick="window.open(&#39;https://discord.gg/xzwUY9R8Tp&#39;, &#39;_blank&#39;)">
+                <i class="fab fa-discord"></i>
+              </button>
+              <button class="visit-btn" onclick="window.open(&#39;https://afcyqmpzsb.itafricagroup.com/&#39;, &#39;_blank&#39;)">
+                VISIT SITE
+              </button>
+            </div>
+          </div>
+          <div class="partner-card">
+            <img alt="Partner Logo" class="partner-image" src="https://cdn.jsdelivr.net/gh/NoahsAmazingTutoringHelp/reimagined-octo-winner@main/pictures/4.png" />
+            <h3 class="partner-title">
+              GN-Math
+            </h3>
+            <p class="partner-desc">
+              A polished collection with fast updates, reliable links, and an active community.
+            </p>
+            <div class="partner-buttons">
+              <button class="discord-btn" onclick="window.open(&#39;https://discord.gg/gn-math&#39;, &#39;_blank&#39;)">
+                <i class="fab fa-discord"></i>
+              </button>
+              <button class="visit-btn" onclick="window.open(&#39;https://gn-math.dev/&#39;, &#39;_blank&#39;)">
+                VISIT SITE
+              </button>
+            </div>
+          </div>
+          <div class="partner-card">
+            <img alt="Partner Logo" class="partner-image" src="https://cdn.jsdelivr.net/gh/NoahsAmazingTutoringHelp/reimagined-octo-winner@main/pictures/6.jpg" />
+            <h3 class="partner-title">
+              Truffled
+            </h3>
+            <p class="partner-desc">
+              Join us so we can grow and hopefully be one of the biggest unblocked game sites ❤️
+            </p>
+            <div class="partner-buttons">
+              <button class="discord-btn" onclick="window.open(&#39;https://discord.gg/truffled&#39;, &#39;_blank&#39;)">
+                <i class="fab fa-discord"></i>
+              </button>
+              <button class="visit-btn" onclick="window.open(&#39;https://truffled.lol/&#39;, &#39;_blank&#39;)">
+                VISIT SITE
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="chat-section">
+        <div class="chat-app-shell" id="chatAppShell">
+          <aside class="chat-sidebar-card">
+            <div class="chat-sidebar-top">
+              <div class="chat-mode-tabs" id="chatModeTabs">
+                <button class="chat-mode-tab is-active" data-chat-view="groups" type="button">
+                  Groupchats
+                </button>
+                <button class="chat-mode-tab" data-chat-view="friends" type="button">
+                  Friends
+                </button>
+                <button class="chat-mode-tab" data-chat-view="dms" type="button">
+                  DMs
+                </button>
+              </div>
+              <div class="chat-sidebar-toolbar">
+                <div>
+                  <div class="chat-sidebar-kicker" id="chatSidebarKicker">
+                    Always on
+                  </div>
+                  <div class="chat-sidebar-heading" id="chatSidebarHeading">
+                    Groupchats
+                  </div>
+                </div>
+                <button class="community-btn community-btn-secondary chat-sidebar-primary" id="chatSidebarPrimaryButton" type="button">
+                  New Group
+                </button>
+              </div>
+              <form class="chat-inline-form" id="chatAddFriendForm" hidden="">
+                <label class="sr-only" for="chatAddFriendInput">
+                  Add Friend
+                </label>
+                <input autocomplete="off" class="text-input" id="chatAddFriendInput" maxlength="16" placeholder="username_to_add" type="text" />
+                <button class="community-btn community-btn-primary" type="submit">
+                  Send Request
+                </button>
+              </form>
+            </div>
+            <div class="chat-sidebar-scroll">
+              <div class="chat-sidebar-section" id="chatIncomingRequestsSection" hidden="">
+                <div class="chat-sidebar-section-title">
+                  Incoming Requests
+                </div>
+                <div class="chat-request-list" id="chatIncomingRequestsList">
+                </div>
+              </div>
+              <div class="chat-sidebar-section" id="chatOutgoingRequestsSection" hidden="">
+                <div class="chat-sidebar-section-title">
+                  Sent Requests
+                </div>
+                <div class="chat-request-list" id="chatOutgoingRequestsList">
+                </div>
+              </div>
+              <div class="chat-sidebar-section" id="chatBlockedSection" hidden="">
+                <div class="chat-sidebar-section-title">
+                  Blocked
+                </div>
+                <div class="chat-request-list" id="chatBlockedList">
+                </div>
+              </div>
+              <div class="chat-conversation-list" id="chatConversationList">
+              </div>
+            </div>
+          </aside>
+          <section class="chat-main-card">
+            <div class="chat-main-empty" id="chatMainEmpty">
+              <div class="chat-main-empty-title">
+                No conversation selected
+              </div>
+              <p>
+                Pick Global Chat, a friend, or a DM to open the conversation here.
+              </p>
+            </div>
+            <div class="chat-room-panel" id="chatRoomPanel" hidden="">
+              <div class="chat-room-top">
+                <div class="chat-room-identity">
+                  <div class="chat-room-avatar" id="chatRoomAvatar">
+                    <span id="chatRoomAvatarFallback">                    G
+</span>
+                    <img alt="Conversation avatar" id="chatRoomAvatarImage" src="" />
+                  </div>
+                  <div class="chat-room-identity-copy">
+                    <div class="chat-room-title" id="chatRoomTitle">
+                      Global Chat
+                    </div>
+                    <div class="chat-room-subtitle" id="chatRoomSubtitle">
+                      No conversation selected.
+                    </div>
+                  </div>
+                </div>
+                <div class="chat-room-top-actions" id="chatRoomActions">
+                </div>
+              </div>
+              <div class="chat-clear-banner" id="chatClearBanner" hidden="">
+              </div>
+              <div class="chat-pinned-banner" id="chatPinnedBanner" hidden="">
+              </div>
+              <div class="chat-message-list" id="chatMessageList">
+              </div>
+              <div class="chat-status-banner" id="chatStatusBanner" hidden="">
+              </div>
+              <form class="chat-composer" id="chatComposer">
+                <div class="chat-composer-meta" hidden="" id="chatComposerMeta">
+                  <div class="chat-composer-chip chat-reply-chip" hidden="" id="chatReplyChip">
+                    <i class="fas fa-reply"></i>
+                    <span class="chat-composer-chip-copy">                    <strong id="chatReplyAuthor">                    Replying
+</strong>
+                    <span id="chatReplyPreview">                    Message preview
+</span>
+</span>
+                    <button class="chat-composer-chip-clear" id="chatReplyClear" type="button">
+                      <i class="fas fa-xmark"></i>
+                    </button>
+                  </div>
+                  <div class="chat-composer-chip" hidden="" id="chatAttachmentChip">
+                    <i class="fas fa-image"></i>
+                    <span id="chatAttachmentName">                    Image ready
+</span>
+                    <button class="chat-composer-chip-clear" id="chatAttachmentClear" type="button">
+                      <i class="fas fa-xmark"></i>
+                    </button>
+                  </div>
+                </div>
+                <div class="chat-mention-menu" hidden="" id="chatMentionMenu">
+                </div>
+                <div class="chat-composer-row">
+                  <input accept="image/png,image/jpeg,image/webp,image/gif" class="file-input" id="chatImageInput" type="file" />
+                  <button class="community-btn community-btn-secondary chat-attach-button" hidden="" id="chatImageButton" type="button">
+                    <i class="fas fa-image"></i>
+                  </button>
+                  <label class="sr-only" for="chatMessageInput">
+                    Message
+                  </label>
+                  <input autocomplete="off" class="chat-message-input" id="chatMessageInput" maxlength="200" placeholder="Type a message..." type="text" />
+                  <button class="community-btn community-btn-primary" id="chatSendButton" type="submit">
+                    Send
+                  </button>
+                </div>
+              </form>
+            </div>
+          </section>
+          <div class="chat-app-lock" id="chatAppLock">
+            <div class="chat-lock-card">
+              <div class="chat-lock-icon">
+                <i class="fas fa-user-lock"></i>
+              </div>
+              <h3>
+                Make an account to unlock chat
+              </h3>
+              <p>
+                Sign in to read, post, manage friends, and open DMs.
+              </p>
+              <button class="community-btn community-btn-primary" type="button" onclick="switchTab(&#39;account&#39;)">
+                Open Account
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="video-section" style="display: none;">
+        <div class="video-shell" id="videoShell">
+          <div class="video-auth-lock" id="videoAuthLock">
+            <div class="video-auth-card">
+              <div class="video-auth-icon">
+                <i class="fas fa-video"></i>
+              </div>
+              <h3>
+                Sign in to use Video Chat
+              </h3>
+              <p>
+                Video Chat is available only to logged-in accounts.
+              </p>
+              <button class="community-btn community-btn-primary" type="button" onclick="switchTab(&#39;account&#39;)">
+                Open Account
+              </button>
+            </div>
+          </div>
+          <div class="video-app" id="videoApp" hidden="">
+            <div class="video-age-gate" id="videoAgeGate">
+              <div class="video-age-card">
+                <div class="video-auth-icon">
+                  <i class="fas fa-user-shield"></i>
+                </div>
+                <h3>
+                  18+ only
+                </h3>
+                <p>
+                  Video chat is unmoderated. Click accept to continue.
+                </p>
+                <button class="community-btn community-btn-primary" id="videoAcceptButton" type="button">
+                  Accept
+                </button>
+              </div>
+            </div>
+            <div class="video-landing-card" id="videoLandingCard" hidden="">
+              <button class="community-btn community-btn-primary video-start-button" id="videoStartButton" type="button">
+                <i class="fas fa-circle-play"></i>
+                <span>                Start
+</span>
+              </button>
+              <div class="video-online-pill" id="videoOnlinePill">
+                0 Online
+              </div>
+            </div>
+            <div class="video-stage" id="videoStage" hidden="">
+              <div class="video-stage-top">
+                <div class="video-stage-copy">
+                  <div class="video-stage-kicker" id="videoStatusKicker">
+                    Searching
+                  </div>
+                  <div class="video-stage-title" id="videoStatusTitle">
+                    Searching for someone...
+                  </div>
+                  <div class="video-stage-subtitle" id="videoStatusSubtitle">
+                    No one is online right now. Waiting for someone to join...
+                  </div>
+                </div>
+                <div class="video-stage-online" id="videoOnlineCountInline">
+                  0 online
+                </div>
+              </div>
+              <div class="video-panels">
+                <div class="video-feed-card is-local">
+                  <div class="video-feed-label">
+                    <span>                    You
+</span>
+                    <span class="video-feed-username" id="videoLocalUsername">                    you
+</span>
+                  </div>
+                  <div class="video-feed-frame">
+                    <video autoplay="" id="videoLocalPreview" muted="" playsinline="">
+                    </video>
+                    <div class="video-feed-placeholder" id="videoLocalPlaceholder">
+                      <i class="fas fa-camera"></i>
+                      <span>                      Camera preview loads here
+</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="video-feed-card is-remote">
+                  <div class="video-feed-label">
+                    <span>                    Stranger
+</span>
+                    <span class="video-feed-username" id="videoRemoteUsername">                    Waiting...
+</span>
+                  </div>
+                  <div class="video-feed-frame">
+                    <video autoplay="" id="videoRemotePreview" playsinline="">
+                    </video>
+                    <div class="video-feed-placeholder" id="videoRemotePlaceholder">
+                      <div class="video-search-pulse">
+                      </div>
+                      <span id="videoRemotePlaceholderText">                      Searching for someone...
+</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="video-chat-strip">
+                <div class="video-chat-log" id="videoChatLog">
+                </div>
+                <form class="video-chat-compose" id="videoChatForm">
+                  <label class="sr-only" for="videoChatInput">
+                    Send a message
+                  </label>
+                  <input autocomplete="off" class="video-chat-input" id="videoChatInput" maxlength="240" placeholder="Say something..." type="text" />
+                  <button class="community-btn community-btn-primary video-chat-send" id="videoChatSendButton" type="submit">
+                    Send
+                  </button>
+                </form>
+              </div>
+              <div class="video-action-bar">
+                <button class="community-btn community-btn-secondary video-action-button" id="videoDisconnectButton" type="button">
+                  <i class="fas fa-phone-slash"></i>
+                  <span>                  Disconnect
+</span>
+                </button>
+                <button class="community-btn community-btn-primary video-action-button" id="videoNextButton" type="button">
+                  <i class="fas fa-forward-step"></i>
+                  <span>                  Next Person
+</span>
+                </button>
+                <button class="community-btn community-btn-secondary video-action-button" id="videoMuteButton" type="button">
+                  <i class="fas fa-microphone"></i>
+                  <span>                  Mute
+</span>
+                </button>
+                <button class="community-btn community-btn-secondary video-action-button" id="videoCameraButton" type="button">
+                  <i class="fas fa-video"></i>
+                  <span>                  Camera
+</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="account-section">
+        <div class="account-shell">
+          <div class="modal-content">
+            <div class="modal-header">
+              <div class="modal-title">
+                <i class="fas fa-user-circle"></i>
+                Account
+              </div>
+            </div>
+            <div class="modal-body account-grid">
+              <div class="setting-item account-auth-card" id="accountAuthCard">
+                <div class="setting-label">
+                  <i class="fas fa-right-to-bracket"></i>
+                  Join the Chat
+                </div>
+                <div class="setting-description">
+                  Create a username and password, or log back in to your existing account.
+                </div>
+                <div class="account-auth-grid">
+                  <form class="account-form" id="accountSignupForm">
+                    <div class="account-form-title">
+                      Create Account
+                    </div>
+                    <label class="account-field">
+                      <span>                      Username
+</span>
+                      <input class="text-input" id="signupUsername" maxlength="16" minlength="3" placeholder="lowercase_username" required="" type="text" />
+                    </label>
+                    <label class="account-field">
+                      <span>                      Password
+</span>
+                      <input class="text-input" id="signupPassword" maxlength="72" minlength="8" placeholder="At least 8 characters" required="" type="password" />
+                    </label>
+                    <label class="account-field">
+                      <span>                      Confirm Password
+</span>
+                      <input class="text-input" id="signupPasswordConfirm" maxlength="72" minlength="8" placeholder="Repeat your password" required="" type="password" />
+                    </label>
+                    <button class="community-btn community-btn-primary" id="signupSubmitButton" type="submit">
+                      Create Account
+                    </button>
+                  </form>
+                  <form class="account-form" id="accountLoginForm">
+                    <div class="account-form-title">
+                      Log In
+                    </div>
+                    <label class="account-field">
+                      <span>                      Username
+</span>
+                      <input autocomplete="username" class="text-input" id="loginUsername" maxlength="16" minlength="3" placeholder="your_username" required="" type="text" />
+                    </label>
+                    <label class="account-field">
+                      <span>                      Password
+</span>
+                      <input autocomplete="current-password" class="text-input" id="loginPassword" maxlength="72" minlength="8" placeholder="Your password" required="" type="password" />
+                    </label>
+                    <button class="community-btn community-btn-primary" id="loginSubmitButton" type="submit">
+                      Log In
+                    </button>
+                  </form>
+                </div>
+                <div class="account-feedback" id="accountAuthFeedback" hidden="">
+                </div>
+              </div>
+              <div class="setting-item account-profile-card" id="accountProfileCard" hidden="">
+                <div class="setting-label">
+                  <i class="fas fa-id-badge"></i>
+                  Profile
+                </div>
+                <div class="setting-description">
+                  Your profile picture appears next to your messages in the live chat.
+                </div>
+                <div class="account-profile-row">
+                  <div class="account-avatar-preview" id="accountAvatarPreview">
+                    <span id="accountAvatarFallback">                    ?
+</span>
+                    <img alt="Profile avatar" id="accountAvatarImage" src="" />
+                  </div>
+                  <div class="account-profile-meta">
+                    <div class="account-profile-username" id="accountProfileUsername">
+                    </div>
+                    <div class="account-profile-created" id="accountProfileCreated">
+                    </div>
+                  </div>
+                </div>
+                <div class="account-avatar-actions">
+                  <input accept="image/png,image/jpeg,image/webp,image/gif" class="file-input" id="avatarUploadInput" type="file" />
+                  <button class="community-btn community-btn-secondary" id="avatarUploadButton" type="button">
+                    Upload Profile Pic
+                  </button>
+                </div>
+                <div class="account-feedback" id="accountAvatarFeedback" hidden="">
+                </div>
+              </div>
+              <div class="setting-item account-status-card" id="accountStatusCard" hidden="">
+                <div class="setting-label">
+                  <i class="fas fa-shield-halved"></i>
+                  Chat Status
+                </div>
+                <div class="setting-description">
+                  Warnings last 24 hours. Two warnings trigger a 30 minute timeout. Three warnings trigger a 3 day ban.
+                </div>
+                <div class="account-status-panel">
+                  <div class="account-status-chip">
+                    <span>                    Warnings
+</span>
+                    <strong id="accountWarningsCount">                    0
+</strong>
+                  </div>
+                  <div class="account-status-chip">
+                    <span>                    Can change username
+</span>
+                    <strong id="accountUsernameChangeTime">                    Now
+</strong>
+                  </div>
+                </div>
+                <div class="account-status-detail" id="accountModerationDetail">
+                  No active penalties on your account.
+                </div>
+              </div>
+              <div class="setting-item account-username-card" id="accountUsernameCard" hidden="">
+                <div class="setting-label">
+                  <i class="fas fa-at"></i>
+                  Change Username
+                </div>
+                <div class="setting-description" id="accountUsernameDescription">
+                  Usernames are unique and can only be changed once every 7 days.
+                </div>
+                <form class="account-form compact" id="accountUsernameForm">
+                  <label class="account-field">
+                    <span>                    New Username
+</span>
+                    <input class="text-input" id="accountUsernameInput" maxlength="16" minlength="3" placeholder="new_username" required="" type="text" />
+                  </label>
+                  <button class="community-btn community-btn-primary" type="submit">
+                    Update Username
+                  </button>
+                </form>
+                <div class="account-feedback" id="accountUsernameFeedback" hidden="">
+                </div>
+              </div>
+              <div class="setting-item account-password-card" id="accountPasswordCard" hidden="">
+                <div class="setting-label">
+                  <i class="fas fa-key"></i>
+                  Change Password
+                </div>
+                <div class="setting-description">
+                  Use your current password, then set the new password you want to keep using.
+                </div>
+                <form class="account-form compact" id="accountPasswordForm">
+                  <label class="account-field">
+                    <span>                    Current Password
+</span>
+                    <input autocomplete="current-password" class="text-input" id="accountCurrentPassword" maxlength="72" minlength="8" required="" type="password" />
+                  </label>
+                  <label class="account-field">
+                    <span>                    New Password
+</span>
+                    <input autocomplete="new-password" class="text-input" id="accountNewPassword" maxlength="72" minlength="8" required="" type="password" />
+                  </label>
+                  <label class="account-field">
+                    <span>                    Confirm New Password
+</span>
+                    <input autocomplete="new-password" class="text-input" id="accountNewPasswordConfirm" maxlength="72" minlength="8" required="" type="password" />
+                  </label>
+                  <button class="community-btn community-btn-primary" type="submit">
+                    Update Password
+                  </button>
+                </form>
+                <div class="account-feedback" id="accountPasswordFeedback" hidden="">
+                </div>
+              </div>
+              <div class="setting-item account-danger-card" id="accountDangerCard" hidden="">
+                <div class="setting-label">
+                  <i class="fas fa-triangle-exclamation"></i>
+                  Session
+                </div>
+                <div class="setting-description">
+                  Logging out only clears this browser session. Deleting your account renames your active chat messages to DELETED USER.
+                </div>
+                <div class="account-danger-actions">
+                  <button class="community-btn community-btn-secondary" id="accountLogoutButton" type="button">
+                    Log Out
+                  </button>
+                  <button class="community-btn community-btn-danger" id="accountDeleteButton" type="button">
+                    Delete Account
+                  </button>
+                </div>
+                <div class="account-feedback" id="accountDangerFeedback" hidden="">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="admin-section">
+        <div class="admin-shell">
+          <div class="modal-content">
+            <div class="modal-header">
+              <div class="modal-title">
+                <i class="fas fa-crown"></i>
+                Owner
+              </div>
+            </div>
+            <div class="modal-body admin-grid">
+              <div class="setting-item admin-card admin-owner-card" id="adminOwnerCard" hidden="">
+                <div class="setting-label">
+                  <i class="fas fa-bullhorn"></i>
+                  Broadcasts &amp; Chat Control
+                </div>
+                <label class="account-field">
+                  <span>                  Sitewide Broadcast
+</span>
+                  <textarea class="text-input admin-textarea" id="adminBroadcastInput" maxlength="600" placeholder="Send a short message that pops up across the site...">
+                  </textarea>
+                </label>
+                <div class="admin-inline-actions">
+                  <button class="community-btn community-btn-primary" id="adminBroadcastSetButton" type="button">
+                    Set Broadcast
+                  </button>
+                  <button class="community-btn community-btn-secondary" id="adminBroadcastClearButton" type="button">
+                    Clear Broadcast
+                  </button>
+                </div>
+                <label class="account-field">
+                  <span>                  Pinned Chat Message
+</span>
+                  <textarea class="text-input admin-textarea" id="adminPinnedInput" maxlength="320" placeholder="Pinned note that always stays at the top of chat...">
+                  </textarea>
+                </label>
+                <div class="admin-inline-actions">
+                  <button class="community-btn community-btn-primary" id="adminPinnedSetButton" type="button">
+                    Set Pinned Message
+                  </button>
+                  <button class="community-btn community-btn-secondary" id="adminPinnedClearButton" type="button">
+                    Clear Pinned Message
+                  </button>
+                  <button class="community-btn community-btn-danger" id="adminWipeChatButton" type="button">
+                    Wipe Chat
+                  </button>
+                </div>
+              </div>
+              <div class="setting-item admin-card admin-user-card" id="adminUserCard" hidden="">
+                <div class="setting-label">
+                  <i class="fas fa-user-shield"></i>
+                  User Actions
+                </div>
+                <div class="setting-description">
+                  Moderate by username, or rename a user to a clean untaken name.
+                </div>
+                <label class="account-field">
+                  <span>                  Target Username
+</span>
+                  <input class="text-input" id="adminTargetUsernameInput" maxlength="16" placeholder="username_to_moderate" type="text" />
+                </label>
+                <div class="admin-inline-actions">
+                  <button class="community-btn community-btn-secondary" id="adminTimeoutUserButton" type="button">
+                    Timeout 30m
+                  </button>
+                  <button class="community-btn community-btn-secondary" id="adminBanUserButton" type="button">
+                    Ban 3d
+                  </button>
+                  <button class="community-btn community-btn-danger" id="adminDeleteUserButton" type="button">
+                    Delete Account
+                  </button>
+                </div>
+                <div class="admin-rename-block">
+                  <label class="account-field">
+                    <span>                    Current Username
+</span>
+                    <input class="text-input" id="adminRenameCurrentInput" maxlength="16" placeholder="current_username" type="text" />
+                  </label>
+                  <label class="account-field">
+                    <span>                    New Username
+</span>
+                    <input class="text-input" id="adminRenameNewInput" maxlength="16" placeholder="new_username" type="text" />
+                  </label>
+                  <button class="community-btn community-btn-primary" id="adminRenameUserButton" type="button">
+                    Rename User
+                  </button>
+                </div>
+              </div>
+              <div class="setting-item admin-card admin-troll-card" id="adminTrollCard" hidden="">
+                <div class="setting-label">
+                  <i class="fas fa-wand-magic-sparkles"></i>
+                  Troll Zone
+                </div>
+                <div class="setting-description">
+                  Fire off one-shot client effects. Uploaded media stays ready until you replace it.
+                </div>
+                <div class="admin-sound-row">
+                  <input accept="audio/mpeg,audio/mp3,audio/wav,audio/x-wav,audio/ogg,audio/webm,audio/mp4" class="file-input" id="adminSoundInput" type="file" />
+                  <button class="community-btn community-btn-secondary" id="adminChooseSoundButton" type="button">
+                    Upload Sound
+                  </button>
+                  <div class="admin-sound-name" id="adminSoundName">
+                    No sound uploaded
+                  </div>
+                </div>
+                <div class="admin-sound-row">
+                  <input accept="image/png,image/jpeg,image/webp,image/gif" class="file-input" id="adminMediaInput" type="file" />
+                  <button class="community-btn community-btn-secondary" id="adminChooseMediaButton" type="button">
+                    Upload Image / GIF
+                  </button>
+                  <div class="admin-sound-name" id="adminMediaName">
+                    No image uploaded
+                  </div>
+                </div>
+                <div class="admin-inline-actions">
+                  <button class="community-btn community-btn-secondary" id="adminPlaySoundButton" type="button">
+                    Play To Everyone
+                  </button>
+                  <button class="community-btn community-btn-secondary" id="adminShowMediaButton" type="button">
+                    Show Image / GIF
+                  </button>
+                  <button class="community-btn community-btn-secondary" id="adminFlashbangButton" type="button">
+                    Flashbang Everyone
+                  </button>
+                  <button class="community-btn community-btn-secondary" id="adminBustButton" type="button">
+                    Bust Effect
+                  </button>
+                  <button class="community-btn community-btn-secondary" id="adminRollButton" type="button">
+                    Barrel Roll Everyone
+                  </button>
+                  <button class="community-btn community-btn-danger" id="adminNukeButton" type="button">
+                    Nuke Button
+                  </button>
+                </div>
+              </div>
+              <div class="setting-item admin-card admin-reports-card" id="adminReportsCard" hidden="">
+                <div class="setting-label">
+                  <i class="fas fa-flag"></i>
+                  Reports
+                </div>
+                <div class="setting-description">
+                  Review message reports, inspect the snapshot, and apply account actions.
+                </div>
+                <div class="admin-report-toolbar">
+                  <label class="admin-report-filter">
+                    <span>                    Status
+</span>
+                    <select class="text-input" id="adminReportsFilter">
+                      <option value="open">
+                        Open Reports
+                      </option>
+                      <option value="closed">
+                        Closed Reports
+                      </option>
+                      <option value="all">
+                        All Reports
+                      </option>
+                    </select>
+                  </label>
+                </div>
+                <div class="admin-reports-list" id="adminReportsList">
+                </div>
+              </div>
+            </div>
+            <div class="account-feedback admin-panel-feedback" id="adminFeedback" hidden="">
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="settings-section">
+        <div class="settings-shell">
+          <div class="modal-content">
+            <div class="modal-header">
+              <div class="modal-title">
+                <i class="fas fa-sliders"></i>
+                Settings
+              </div>
+            </div>
+            <div class="modal-body">
+              <!-- Group 1: Appearance -->
+              <details class="settings-group">
+                <summary class="settings-group-header">
+                  <i class="fas fa-palette"></i>
+                  Appearance
+                  <i class="fas fa-chevron-down settings-group-arrow"></i>
+                </summary>
+                <div class="settings-group-body">
+                  <div class="setting-item setting-item-wide setting-theme">
+                    <div class="setting-label">
+                      <i class="fas fa-palette"></i>
+                      Theme Color
+                    </div>
+                    <div class="setting-description">
+                      Pick a preset accent or dial in your own custom color.
+                    </div>
+                    <div class="theme-preview">
+                      <div class="theme-option active" data-theme="default" onclick="selectPresetTheme(&#39;default&#39;)" title="Default Orange">
+                      </div>
+                      <div class="theme-option" data-theme="rainbow" onclick="selectPresetTheme(&#39;rainbow&#39;)" title="Rainbow">
+                      </div>
+                      <div class="theme-option" data-theme="cyber-green" onclick="selectPresetTheme(&#39;cyber-green&#39;)" title="Cyber Green">
+                      </div>
+                      <div class="theme-option" data-theme="ice-blue" onclick="selectPresetTheme(&#39;ice-blue&#39;)" title="Ice Blue">
+                      </div>
+                      <div class="theme-option" data-theme="solarized" onclick="selectPresetTheme(&#39;solarized&#39;)" title="Solarized">
+                      </div>
+                      <div class="theme-option" data-theme="purple-haze" onclick="selectPresetTheme(&#39;purple-haze&#39;)" title="Purple Haze">
+                      </div>
+                      <div class="theme-option" data-theme="custom" onclick="selectPresetTheme(&#39;custom&#39;)" title="Custom Color">
+                        <i class="fas fa-plus" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; z-index: 2;"></i>
+                      </div>
+                    </div>
+                    <div class="color-input-container" id="customColorInput" style="display: none;">
+                      <div class="color-preview" id="colorPreview">
+                      </div>
+                      <input class="color-input" id="customHexInput" maxlength="7" placeholder="#c27c15" type="text" />
+                      <button class="apply-btn" onclick="applyCustomTheme()">
+                        Apply Color
+                      </button>
+                    </div>
+                  </div>
+                  <div class="setting-item setting-item-wide setting-background">
+                    <div class="setting-label">
+                      <i class="fas fa-layer-group"></i>
+                      Background
+                    </div>
+                    <div class="setting-description">
+                      Choose the motion style running behind the site.
+                    </div>
+                    <div class="background-options" id="backgroundOptions">
+                      <button class="background-option" data-background="language-rain" onclick="setBackgroundStyle(&#39;language-rain&#39;)">
+                        Language Rainfall
+                      </button>
+                      <button class="background-option" data-background="matrix" onclick="setBackgroundStyle(&#39;matrix&#39;)">
+                        Matrix
+                      </button>
+                      <button class="background-option" data-background="topography" onclick="setBackgroundStyle(&#39;topography&#39;)">
+                        Topography
+                      </button>
+                      <button class="background-option" data-background="constellation" onclick="setBackgroundStyle(&#39;constellation&#39;)">
+                        Constellation
+                      </button>
+                      <button class="background-option" data-background="starfield" onclick="setBackgroundStyle(&#39;starfield&#39;)">
+                        Starfield
+                      </button>
+                    </div>
+                  </div>
+                  <div class="setting-item setting-cursor">
+                    <div class="setting-label">
+                      <i class="fas fa-mouse-pointer"></i>
+                      Custom Cursor
+                    </div>
+                    <div class="setting-description">
+                      Swap between cursor styles without reloading the page.
+                    </div>
+                    <select class="text-input" id="cursorStyleSelect" onchange="setCursorStyle(this.value)">
+                      <option value="default">
+                        Default
+                      </option>
+                      <option value="ring">
+                        Ring
+                      </option>
+                      <option value="dot">
+                        Dot
+                      </option>
+                      <option value="square">
+                        Square
+                      </option>
+                      <option value="crosshair">
+                        Crosshair
+                      </option>
+                    </select>
+                  </div>
+                </div>
+              </details>
+              <!-- Group 2: Tab Disguise -->
+              <details class="settings-group">
+                <summary class="settings-group-header">
+                  <i class="fas fa-user-secret"></i>
+                  Tab Disguise
+                  <i class="fas fa-chevron-down settings-group-arrow"></i>
+                </summary>
+                <div class="settings-group-body">
+                  <div class="setting-item setting-inactive">
+                    <div class="setting-label">
+                      <i class="fas fa-window-maximize"></i>
+                      Inactive Tab Title &amp; Icon
+                    </div>
+                    <div class="setting-description">
+                      Control how the tab looks when it is hidden in the background.
+                    </div>
+                    <input class="text-input" id="customTitle" placeholder="Inactive tab title..." type="text" value="Home" />
+                    <input class="text-input" id="customFavicon" placeholder="Inactive favicon URL..." type="text" value="https://raw.githubusercontent.com/NoahsAmazingTutoringHelp/Noahs-Calculus-Tutor/master/images/fruh.png" />
+                    <div class="settings-button-row">
+                      <button class="apply-btn" onclick="applyInactiveTabSettings()">
+                        <i class="fas fa-check"></i>
+                        Apply Settings
+                      </button>
+                      <button class="apply-btn btn-danger" onclick="revertFavicon(this)">
+                        <i class="fas fa-undo"></i>
+                        Revert
+                      </button>
+                    </div>
+                  </div>
+                  <div class="setting-item setting-logo">
+                    <div class="setting-label">
+                      <i class="fas fa-image"></i>
+                      Site Logo
+                    </div>
+                    <div class="setting-description">
+                      Upload a replacement logo for the homepage and header.
+                    </div>
+                    <div class="file-upload-container">
+                      <div class="logo-preview" id="logoPreview">
+                        <img alt="Logo Preview" src="" style="display: none;" />
+                        <i class="fas fa-image" style="color: var(--gray-text); font-size: 1.5rem;"></i>
+                      </div>
+                      <label class="file-btn">
+                        <i class="fas fa-upload"></i>
+                        Choose Logo
+                        <input accept="image/*" class="file-input" id="logoUpload" onchange="handleLogoUpload(event)" type="file" />
+                      </label>
+                    </div>
+                    <button class="apply-btn" onclick="revertLogo(this)" style="margin-top: 10px; width: 100%;">
+                      <i class="fas fa-undo"></i>
+                      Revert to Default Logo
+                    </button>
+                  </div>
+                </div>
+              </details>
+              <!-- Group 3: Privacy -->
+              <details class="settings-group">
+                <summary class="settings-group-header">
+                  <i class="fas fa-lock"></i>
+                  Privacy
+                  <i class="fas fa-chevron-down settings-group-arrow"></i>
+                </summary>
+                <div class="settings-group-body">
+                  <div class="setting-item setting-ads">
+                    <div class="setting-label">
+                      <i class="fas fa-ad"></i>
+                      Disable Ads
+                    </div>
+                    <div class="setting-description">
+                      Compatibility toggle for ad behavior and saved preference state.
+                    </div>
+                    <label class="toggle-switch">
+                      <input id="adToggle" onchange="toggleAds(this.checked)" type="checkbox" />
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </div>
+                </div>
+              </details>
+              <!-- Group 4: Data -->
+              <details class="settings-group">
+                <summary class="settings-group-header">
+                  <i class="fas fa-floppy-disk"></i>
+                  Data
+                  <i class="fas fa-chevron-down settings-group-arrow"></i>
+                </summary>
+                <div class="settings-group-body">
+                  <div class="setting-item setting-import">
+                    <div class="setting-label">
+                      <i class="fas fa-database"></i>
+                      Export/Import Site Data
+                    </div>
+                    <div class="setting-description">
+                      Back up or restore site data including settings, favorites, storage, and cookies.
+                    </div>
+                    <div class="settings-button-row" style="margin-top: 15px;">
+                      <button class="apply-btn" onclick="exportSettings()">
+                        <i class="fas fa-download"></i>
+                        Export Data
+                      </button>
+                      <button class="apply-btn" onclick="importSettings()">
+                        <i class="fas fa-upload"></i>
+                        Import Data
+                      </button>
+                    </div>
+                    <div class="file-upload-container" id="importFileContainer" style="display: none; margin-top: 15px;">
+                      <input accept=".json,application/json" class="file-input" id="settingsFileInput" type="file" />
+                      <label class="file-btn" for="settingsFileInput" style="flex: 1;">
+                        <i class="fas fa-file-import"></i>
+                        Select
+                    Settings File
+                      </label>
+                    </div>
+                    <div id="settingsImportStatus" style="margin-top: 10px; color: var(--accent-orange); font-size: 0.9rem; display: none;">
+                    </div>
+                  </div>
+                </div>
+              </details>
+            </div>
+          </div>
+        </div>
+      </section>
+      <footer>
+        <p>
+          © 2026 Noah&#39;s Tutoring Hub. All rights reserved.
+        </p>
+        <p>
+          Educational purposes only.
+        </p>
+        <p>
+          Site mostly coded by
+          <a href="https://1key.lol" target="_blank" rel="noopener noreferrer" style="color: var(--primary-orange); text-decoration: underline; text-decoration-color: var(--primary-orange); text-underline-offset: 3px; transition: all 0.3s ease;" onmouseover="this.style.color=&#39;var(--accent-orange)&#39;; this.style.textDecorationColor=&#39;var(--accent-orange)&#39;;" onmouseout="this.style.color=&#39;var(--primary-orange)&#39;; this.style.textDecorationColor=&#39;var(--primary-orange)&#39;;">          1key
+</a>
+          .
+        </p>
+      </footer>
+    </div>
+    <div class="game-page" id="gamePage">
+      <div class="game-browser">
+        <div class="game-tabbar">
+          <div class="game-tabs-strip" id="gameTabsStrip">
+          </div>
+          <div class="game-toolbar">
+            <button class="btn refresh-btn" onclick="refreshGame()" title="Reload Active Tab">
+              <i class="fas fa-rotate-right"></i>
+            </button>
+            <button class="btn" onclick="downloadCurrentGame()" title="Download Active Tab">
+              <i class="fas fa-download"></i>
+            </button>
+            <button class="btn" onclick="toggleFullscreen()" title="Fullscreen Active Tab">
+              <i class="fas fa-expand"></i>
+            </button>
+            <button class="btn" onclick="openTabInfoModal()" title="Credits &amp; Links">
+              <i class="fas fa-circle-info"></i>
+            </button>
+            <button class="btn" onclick="exitGameBrowser()" title="Exit Browser">
+              <i class="fas fa-xmark"></i>
+            </button>
+          </div>
+        </div>
+        <div class="game-view-stack" id="gameViews">
+        </div>
+      </div>
+    </div>
+    <div class="tab-info-modal" id="tabInfoModal" aria-hidden="true" role="dialog">
+      <div class="tab-info-modal-card">
+        <div class="tab-info-header">
+          <div class="tab-info-title">
+            <i class="fas fa-circle-info"></i>
+            Tab Credits
+          </div>
+          <button class="tab-info-close" onclick="closeTabInfoModal()">
+            <i class="fas fa-xmark"></i>
+          </button>
+        </div>
+        <p class="tab-info-text">
+          Tab and other features were made by
+          <a href="https://1key.lol/" target="_blank">          1key
+</a>
+          .
+        </p>
+        <div class="tab-info-link-list">
+          <div class="tab-info-link-row">
+            <span class="tab-info-link-label">            Website
+</span>
+            <a class="tab-info-link-url" href="https://1key.lol/" target="_blank">            https://1key.lol/
+</a>
+            <button class="tab-info-copy-btn" onclick="copyTabInfoLink(&#39;https://1key.lol/&#39;, this)">
+              Copy
+            </button>
+          </div>
+          <div class="tab-info-link-row">
+            <span class="tab-info-link-label">            Discord
+</span>
+            <a class="tab-info-link-url" href="https://discord.gg/XK8vQGrfqv" target="_blank">            https://discord.gg/XK8vQGrfqv
+</a>
+            <button class="tab-info-copy-btn" onclick="copyTabInfoLink(&#39;https://discord.gg/XK8vQGrfqv&#39;, this)">
+              Copy
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button id="backToTop" title="Go to top">
+      <i class="fas fa-arrow-up"></i>
+    </button>
+    <div id="contextMenu">
+      <div class="context-menu-item" onclick="openSettings()">
+        <i class="fas fa-cog"></i>
+        <span>        Settings
+</span>
+        <span class="menu-shortcut">        Ctrl+Shift+S
+</span>
+      </div>
+      <div class="context-menu-item" onclick="window.location.reload()">
+        <i class="fas fa-redo"></i>
+        <span>        Refresh
+</span>
+        <span class="menu-shortcut">        F5
+</span>
+      </div>
+      <div class="menu-divider">
+      </div>
+      <div class="context-menu-item" onclick="openSiteInAboutBlank()">
+        <i class="fas fa-external-link-alt"></i>
+        <span>        About:Blank
+</span>
+      </div>
+    </div>
+    <div class="chat-modal" id="chatGroupModal" hidden="">
+      <div class="chat-modal-card">
+        <div class="chat-modal-header">
+          <div class="chat-modal-title">
+            <i class="fas fa-users"></i>
+            New Group Chat
+          </div>
+        </div>
+        <form class="chat-modal-body" id="chatGroupForm">
+          <label class="account-field">
+            <span>            Group Name
+</span>
+            <input class="text-input" id="chatGroupNameInput" maxlength="40" minlength="3" placeholder="study_squad" required="" type="text" />
+          </label>
+          <label class="account-field">
+            <span>            Add Members
+</span>
+            <input class="text-input" id="chatGroupUsersInput" maxlength="500" placeholder="comma,separated,usernames" type="text" />
+          </label>
+          <div class="account-avatar-actions">
+            <input accept="image/png,image/jpeg,image/webp" class="file-input" id="chatGroupAvatarInput" type="file" />
+            <button class="community-btn community-btn-secondary" id="chatGroupAvatarButton" type="button">
+              Upload Group Pic
+            </button>
+            <div class="chat-modal-file-name" id="chatGroupAvatarName">
+              No image selected
+            </div>
+          </div>
+          <div class="chat-modal-actions">
+            <button class="community-btn community-btn-secondary" id="chatGroupCancelButton" type="button">
+              Cancel
+            </button>
+            <button class="community-btn community-btn-primary" type="submit">
+              Create Group
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="chat-modal" id="chatGroupManageModal" hidden="">
+      <div class="chat-modal-card">
+        <div class="chat-modal-header">
+          <div class="chat-modal-title">
+            <i class="fas fa-gear"></i>
+            Group Settings
+          </div>
+        </div>
+        <form class="chat-modal-body" id="chatGroupManageForm">
+          <label class="account-field">
+            <span>            Group Name
+</span>
+            <input class="text-input" id="chatManageGroupNameInput" maxlength="40" minlength="3" placeholder="study_squad" type="text" />
+          </label>
+          <label class="account-field">
+            <span>            Add Members
+</span>
+            <input class="text-input" id="chatManageGroupUsersInput" maxlength="500" placeholder="comma,separated,usernames" type="text" />
+          </label>
+          <div class="account-avatar-actions">
+            <input accept="image/png,image/jpeg,image/webp" class="file-input" id="chatManageGroupAvatarInput" type="file" />
+            <button class="community-btn community-btn-secondary" id="chatManageGroupAvatarButton" type="button">
+              Upload Group Pic
+            </button>
+            <div class="chat-modal-file-name" id="chatManageGroupAvatarName">
+              No image selected
+            </div>
+          </div>
+          <div class="chat-modal-actions">
+            <button class="community-btn community-btn-secondary" id="chatManageGroupCancelButton" type="button">
+              Close
+            </button>
+            <button class="community-btn community-btn-primary" id="chatManageGroupSaveButton" type="submit">
+              Save Changes
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="chat-modal" id="chatReportModal" hidden="">
+      <div class="chat-modal-card">
+        <div class="chat-modal-header">
+          <div class="chat-modal-title">
+            <i class="fas fa-flag"></i>
+            Report Message
+          </div>
+        </div>
+        <form class="chat-modal-body" id="chatReportForm">
+          <div class="chat-report-preview" id="chatReportPreview">
+          </div>
+          <label class="account-field">
+            <span>            Reason
+</span>
+            <textarea class="text-input admin-textarea" id="chatReportReasonInput" maxlength="300" placeholder="Explain what happened..." required="">
+            </textarea>
+          </label>
+          <div class="chat-modal-actions">
+            <button class="community-btn community-btn-secondary" id="chatReportCancelButton" type="button">
+              Cancel
+            </button>
+            <button class="community-btn community-btn-primary" type="submit">
+              Submit Report
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="avatar-crop-modal" id="avatarCropModal" aria-hidden="true">
+      <div class="avatar-crop-card">
+        <div class="avatar-crop-header">
+          <div class="avatar-crop-title">
+            <i class="fas fa-crop-simple"></i>
+            Crop Profile Picture
+          </div>
+        </div>
+        <div class="avatar-crop-body">
+          <div class="avatar-crop-stage">
+            <canvas height="320" id="avatarCropCanvas" width="320">
+            </canvas>
+            <div class="avatar-crop-guide">
+            </div>
+          </div>
+          <label class="avatar-crop-control">
+            <span>            Zoom
+</span>
+            <input id="avatarCropZoom" max="3" min="1" step="0.01" type="range" value="1" />
+          </label>
+          <div class="avatar-crop-help">
+            Drag the image inside the frame, then approve the crop.
+          </div>
+          <div class="avatar-crop-actions">
+            <button class="community-btn community-btn-secondary" id="avatarCropCancel" type="button">
+              Cancel
+            </button>
+            <button class="community-btn community-btn-primary" id="avatarCropApprove" type="button">
+              Approve
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="troll-media-overlay" id="trollMediaOverlay" hidden="">
+      <img alt="Broadcast media" id="trollMediaImage" src="" />
+    </div>
+    <div class="site-flashbang-overlay" id="siteFlashbangOverlay" hidden="">
+    </div>
+    <div class="site-bust-overlay" id="siteBustOverlay" hidden="">
+      <img alt="Bust effect" class="site-bust-image" id="siteBustImage" src="bust.gif" />
+    </div>
+    <div class="site-nuke-overlay" id="siteNukeOverlay" hidden="">
+      <div class="site-nuke-panel">
+        <div class="site-nuke-title" id="siteNukeTitle">
+          If you have epilepsy or are photosensitive, leave the page now.
+        </div>
+        <div class="site-nuke-timer" id="siteNukeTimer">
+          5.00
+        </div>
+        <div class="site-nuke-note" id="siteNukeNote">
+          Sitewide admin takeover in progress.
+        </div>
+      </div>
+    </div>
+    <script src="scripts/starfield.js">
+    </script>
+    <script src="js/games.js?v=20260311025500">
+    </script>
+    <script src="js/main.js?v=20260311102000">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/pocketbase@0.26.8/dist/pocketbase.umd.js" crossorigin="anonymous">
+    </script>
+    <script src="js/online-counter.js">
+    </script>
+    <script src="js/video-chat.js?v=20260311162000">
+    </script>
+    <script src="js/live-chat.js?v=20260311142000">
+    </script>
+    <div class="site-broadcast-banner" id="siteBroadcastBanner" hidden="">
+    </div>
+    <div class="site-mention-toast" id="siteMentionToast" hidden="">
+      <div class="site-mention-toast-avatar" id="siteMentionToastAvatar">
+        <span id="siteMentionToastAvatarFallback">        ?
+</span>
+        <img alt="Mentioned by" id="siteMentionToastAvatarImage" src="" />
+      </div>
+      <div class="site-mention-toast-copy">
+        <div class="site-mention-toast-kicker">
+          Mention
+        </div>
+        <div class="site-mention-toast-title" id="siteMentionToastTitle">
+          New mention
+        </div>
+        <div class="site-mention-toast-body" id="siteMentionToastBody">
+        </div>
+      </div>
+    </div>
+  </body>
 </html>
